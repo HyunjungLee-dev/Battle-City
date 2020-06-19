@@ -23,7 +23,7 @@
     <ProjectGuid>{CDBC2239-A9CA-45CA-9CB1-C61A35ACF68E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>BattleCity</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -105,6 +105,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -143,15 +144,21 @@
     <ClCompile Include="BattleCityMain.cpp" />
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="BitMapManager.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Maptool.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="BitMapManager.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Maptool.h" />
     <ClInclude Include="Mecro.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Singleton.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

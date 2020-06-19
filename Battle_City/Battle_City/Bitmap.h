@@ -1,7 +1,7 @@
 #pragma once
 #include "Mecro.h"
 
-class BitMap
+class Bitmap
 {
 private:
 	HDC     MemDC;
@@ -18,6 +18,6 @@ public:
 	inline SIZE GetSize() { return m_size; }
 	HDC GetMemDC() { return MemDC; }
 	void Release();
-	BitMap();
-	~BitMap();
+	Bitmap();
+	~Bitmap();
 };

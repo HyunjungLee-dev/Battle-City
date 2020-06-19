@@ -1,15 +1,15 @@
 #pragma once
-#include"BitMap.h"
+#include"Bitmap.h"
 #include"Singleton.h"
 
 
 class BitMapManager : public Singleton< BitMapManager>
 {
 private:
-	BitMap m_BackBuffer;
-	vector<BitMap*> m_MapImglist;
-	vector<BitMap*> m_TankImglist;
-	vector<BitMap*> m_ObjectImglist;
+	Bitmap m_BackBuffer;
+	vector<Bitmap*> m_MapImglist;
+	vector<Bitmap*> m_TankImglist;
+	vector<Bitmap*> m_ObjectImglist;
 	HDC BufferDC;
 
 public:
@@ -20,10 +20,10 @@ public:
 	void Clear();
 
 	HDC GetBufferDC() { return BufferDC; }
-	BitMap GetBackBuffer() { return m_BackBuffer; }
-	BitMap* GetImg(MAP index) { return m_MapImglist.at(index); }
-	BitMap* GetImg(TANK index) { return m_TankImglist.at(index); }
-	BitMap* GetImg(OBJECT index) { return m_ObjectImglist.at(index); }
+	Bitmap GetBackBuffer() { return m_BackBuffer; }
+	Bitmap* GetImg(MAP index) { return m_MapImglist.at(index); }
+	Bitmap* GetImg(TANK index) { return m_TankImglist.at(index); }
+	Bitmap* GetImg(OBJECT index) { return m_ObjectImglist.at(index); }
 	BitMapManager();
 	~BitMapManager();
 };

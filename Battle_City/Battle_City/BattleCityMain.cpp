@@ -46,7 +46,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 		}
 		else
 		{
-			g_game.Render();
+			g_game.Update();
 			//Update
 		}
 
@@ -66,9 +66,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	switch (iMessage)
 	{
 	case WM_CREATE:
-		CreateWindow(L"button", L"Save", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 100, 400, 100, 30, hWnd, (HMENU)100, g_hInst, NULL);
-		CreateWindow(L"button", L"Load", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 200, 400, 100, 30, hWnd, (HMENU)101, g_hInst, NULL);
-		CreateWindow(L"button", L"LoadJson", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300, 400, 100, 30, hWnd, (HMENU)102, g_hInst, NULL);
+		//CreateWindow(L"button", L"Save", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 100, 400, 100, 30, hWnd, (HMENU)100, g_hInst, NULL);
+		//CreateWindow(L"button", L"Load", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 200, 400, 100, 30, hWnd, (HMENU)101, g_hInst, NULL);
+		//CreateWindow(L"button", L"LoadJson", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300, 400, 100, 30, hWnd, (HMENU)102, g_hInst, NULL);
 		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
