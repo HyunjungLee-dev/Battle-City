@@ -8,6 +8,8 @@ using namespace std;
 #define HEIGHT 25
 
 
+
+
 enum MAP
 {
 	MAPWIDTH = 13,
@@ -87,12 +89,30 @@ enum OBJECT
 	OBJE_SHIELD00,
 	OBJE_SHIELD01,
 	OBJE_STAGE,
+	OBJE_TITLE,
 	OBJE_END
 };
 
 enum GAMESTATE
 {
 	GAMEWAIT,
+	GAMESTAGE,
 	GAMESTART,
+	GAMEPLAY,
+	GAMCONSTRUCTION,
 	GAMEEND,
+};
+
+enum TYPE
+{
+	ENEMY,
+	PLAYER
+};
+
+struct Tank
+{
+	RECT Rct;
+	float X;
+	float Y;
+	TYPE TankType;
 };

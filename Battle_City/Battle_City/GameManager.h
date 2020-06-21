@@ -2,6 +2,7 @@
 #include"Maptool.h"
 #include"Font.h"
 #include"Player.h"
+#include"Enemy.h"
 class GameManager
 {
 private:
@@ -18,15 +19,19 @@ private:
 
 	Font m_Font;
 	Player m_Player;
+	Enemy m_Enemy;
 
 	int m_iTitleY;
 	int m_iSelect;
 	int m_iHiScore;
+	int m_iStage;
 public:
 	void Init(HWND hWnd);
 	void Update();
 	void Render();
 	void Title();
+	void Stage();
+	void MapRender();
 
 	Maptool* GetMapTool() {return m_Map;}
 	GameManager();

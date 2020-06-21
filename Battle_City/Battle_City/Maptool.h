@@ -10,9 +10,9 @@ private:
 public:
 	void Init(HWND hwnd);
 	void Create(POINT pt);
-	void Render(HDC hdc);
+	void Render(HDC hdc, int startX, int StartY);
 	void Save();
-	void Load();
+	void Load(LPCWSTR Flie);
 	Maptool();
 	~Maptool();
 };

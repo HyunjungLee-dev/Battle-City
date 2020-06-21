@@ -24,8 +24,10 @@ void Maptool::Create(POINT pt)
 	}
 }
 
-void Maptool::Render(HDC hdc)
+void Maptool::Render(HDC hdc,int startX,int StartY)
 {
+	RECT ret = { startX ,StartY, WIDTH * 13 , HEIGHT * 13 };
+	PatBlt(hdc, ret.left, ret.top, ret.right, ret.bottom, BLACKNESS);
 
 	for (int i = 0; i < 13; i++)
 	{
@@ -33,10 +35,11 @@ void Maptool::Render(HDC hdc)
 		{
 			if (g_map[i][j] == MAP_NONE)
 			{
-				//Rectangle(hdc, j * WIDTH, i * HEIGHT, (j + 1) * WIDTH, (i + 1) * HEIGHT);
+				//Rectangle(hdc, startX + j * WIDTH, StartY + i * HEIGHT, startX + (j + 1) * WIDTH, StartY + (i + 1) * HEIGHT);
+
 			}
 			else
-				BitMapManager::GetSingleton()->GetImg((MAP)g_map[i][j])->Draw(hdc, j * WIDTH, i * HEIGHT, 1, 1);
+				BitMapManager::GetSingleton()->GetImg((MAP)g_map[i][j])->Draw(hdc, startX + j * WIDTH, StartY + i * HEIGHT, 1, 1);
 			
 		}
 	}
@@ -76,9 +79,9 @@ void Maptool::Save()
 	InvalidateRect(m_hWnd, NULL, false);
 }
 
-void Maptool::Load()
+void Maptool::Load(LPCWSTR Flie)
 {
-	HANDLE hFile = CreateFile(L"save.txt", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	HANDLE hFile = CreateFile(Flie, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	for (int i = 0; i < 13; i++)
 	{
 		for (int j = 0; j < 13; j++)

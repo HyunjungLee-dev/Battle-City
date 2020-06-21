@@ -20,7 +20,7 @@ void Font::Text(int x, int y, LPCWSTR text, COLORREF color)
 
 	wsprintf(str, text);
 
-	SetBkColor(m_Fonthdc, 0x00000000);
+	SetBkMode(m_Fonthdc, TRANSPARENT);
 	SetTextColor(m_Fonthdc, color);
 
 

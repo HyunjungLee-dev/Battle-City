@@ -24,13 +24,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 	WndClass.style = CS_HREDRAW | CS_VREDRAW;
 	RegisterClass(&WndClass);
 
-	int	nWidth, nHeight;//±âº» 256X240
-	nWidth = 512 + GetSystemMetrics(SM_CXFRAME) * 2;
-	nHeight = 448 + GetSystemMetrics(SM_CYFRAME) * 2 +
-		GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
+	RECT rt = { 0, 0, 512 ,448 };
+	AdjustWindowRect(&rt, WS_OVERLAPPEDWINDOW, false);
 
-	hWnd = CreateWindow(lpszClass, lpszClass, WS_OVERLAPPEDWINDOW, 0, 0,
-		nWidth, nHeight, NULL, (HMENU)NULL, hInstance, NULL);
+	hWnd = CreateWindow(lpszClass, lpszClass, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rt.right - rt.left, rt.bottom - rt.top, NULL, (HMENU)NULL, hInstance, NULL);
+	ShowWindow(hWnd, nCmdShow);
 	ShowWindow(hWnd, nCmdShow);
 
 	//Init
@@ -84,7 +82,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		break;
 		case 101://load
 		{
-			g_game.GetMapTool()->Load();
+			//g_game.GetMapTool()->Load();
 		}
 		break;
 		}

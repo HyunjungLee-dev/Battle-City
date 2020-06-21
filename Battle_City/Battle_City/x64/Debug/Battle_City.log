@@ -1,12 +1,14 @@
-﻿  BattleCityMain.cpp
-c:\users\a07\documents\github\hyunjunglee\mine\battle-city\battle_city\battle_city\battlecitymain.cpp(62): warning C4101: 'hdc' :참조되지 않은 지역 변수입니다.
-c:\users\a07\documents\github\hyunjunglee\mine\battle-city\battle_city\battle_city\battlecitymain.cpp(63): warning C4101: 'ps' :참조되지 않은 지역 변수입니다.
-  GameManager.cpp
-c:\users\a07\documents\github\hyunjunglee\mine\battle-city\battle_city\battle_city\gamemanager.cpp(85): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\a07\documents\github\hyunjunglee\mine\battle-city\battle_city\battle_city\gamemanager.cpp(87): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\a07\documents\github\hyunjunglee\mine\battle-city\battle_city\battle_city\gamemanager.cpp(89): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\a07\documents\github\hyunjunglee\mine\battle-city\battle_city\battle_city\gamemanager.cpp(90): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\a07\documents\github\hyunjunglee\mine\battle-city\battle_city\battle_city\gamemanager.cpp(102): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\a07\documents\github\hyunjunglee\mine\battle-city\battle_city\battle_city\gamemanager.cpp(104): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  코드를 생성하고 있습니다...
-  Battle_City.vcxproj -> C:\Users\A07\Documents\GitHub\HyunjungLEE\Mine\Battle-City\Battle_City\x64\Debug\Battle_City.exe
+﻿  GameManager.cpp
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(106): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(106): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(112): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(114): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(119): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(120): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(143): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(145): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(181): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(191): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(192): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\gamemanager.cpp(237): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Battle_City.vcxproj -> D:\Github\Battle-City\Battle_City\x64\Debug\Battle_City.exe
