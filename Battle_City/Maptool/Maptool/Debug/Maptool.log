@@ -1,0 +1,4 @@
+﻿  ToolMain.cpp
+c:\users\lee\desktop\battle-city\battle_city\maptool\maptool\toolmain.cpp(63): warning C4101: 'hdc' :참조되지 않은 지역 변수입니다.
+c:\users\lee\desktop\battle-city\battle_city\maptool\maptool\toolmain.cpp(64): warning C4101: 'ps' :참조되지 않은 지역 변수입니다.
+  Maptool.vcxproj -> C:\Users\LEE\Desktop\Battle-City\Battle_City\Maptool\Debug\Maptool.exe

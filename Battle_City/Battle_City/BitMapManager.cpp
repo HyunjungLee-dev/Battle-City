@@ -81,6 +81,7 @@ void BitMapManager::ObjectImgLoad()
 	m_ObjectImglist.at(OBJE_SHIELD01)->ImgLoad(BufferDC, L"Res//shield_01.bmp");
 	m_ObjectImglist.at(OBJE_STAGE)->ImgLoad(BufferDC, L"Res//stage_icon.bmp");
 	m_ObjectImglist.at(OBJE_TITLE)->ImgLoad(BufferDC, L"Res//Title.bmp");
+	m_ObjectImglist.at(OBJE_APPEAR)->ImgLoad(BufferDC, L"Res//appear.bmp");
 }
 
 void BitMapManager::Clear()

@@ -21,6 +21,8 @@ private:
 	Player m_Player;
 	Enemy m_Enemy;
 
+	int MapStartX, MapStartY;
+
 	int m_iTitleY;
 	int m_iSelect;
 	int m_iHiScore;

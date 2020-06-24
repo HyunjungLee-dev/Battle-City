@@ -9,39 +9,54 @@ Maptool::Maptool()
 void Maptool::Init(HWND hwnd)
 {
 	m_hWnd = hwnd;
-	memset(g_map, -1, sizeof(int) * 13 * 13); // √ ±‚»≠
+	SetMap();
+}
+
+void Maptool::SetMap()
+{
+	for (int i = 0; i < TILEY; i++)
+	{
+		for (int j = 0; j < TILEX; j++)
+		{
+			m_Map.push_back(new Tile);
+			m_Map.back()->eTileType = MAP_NONE;
+			m_Map.back()->fX = j * TILESIZEX;
+			m_Map.back()->fY = i * TILESIZEY;
+		}
+	}
 }
 
 void Maptool::Create(POINT pt)
 {
-	if ((pt.x <  WIDTH * 13 && pt.x > 0) && (pt.y <   HEIGHT * 13 && pt.y > 0))
+	int index = (pt.y / TILESIZEY) * TILEX + (pt.x / TILESIZEX);
+
+	if ((pt.x < TILESIZEX * TILEX && pt.x > 0) && (pt.y < TILESIZEY * TILEY && pt.y > 0))
 	{
-		if (g_map[pt.y / HEIGHT][pt.x / WIDTH] >= MAP_ENDFALGE)
-			g_map[pt.y / HEIGHT][pt.x / WIDTH] = MAP_NONE;
+		if (m_Map[index]->eTileType >= MAP_ENDFALGE)
+			m_Map[index]->eTileType = MAP_NONE;
 		else
-			g_map[pt.y / HEIGHT][pt.x / WIDTH]++;
+		{
+
+			m_Map[index]->eTileType++;
+		}
 		InvalidateRect(m_hWnd, NULL, true);
 	}
 }
 
-void Maptool::Render(HDC hdc,int startX,int StartY)
+void Maptool::Render(HDC hdc, int startX, int StartY)
 {
-	RECT ret = { startX ,StartY, WIDTH * 13 , HEIGHT * 13 };
+	RECT ret = { startX ,StartY, TILESIZEX * TILEX , TILESIZEY * TILEY };
 	PatBlt(hdc, ret.left, ret.top, ret.right, ret.bottom, BLACKNESS);
 
-	for (int i = 0; i < 13; i++)
+	for (int i = 0; i < m_Map.size(); i++)
 	{
-		for (int j = 0; j < 13; j++)
+		if (m_Map[i]->eTileType == MAP_NONE)
 		{
-			if (g_map[i][j] == MAP_NONE)
-			{
-				//Rectangle(hdc, startX + j * WIDTH, StartY + i * HEIGHT, startX + (j + 1) * WIDTH, StartY + (i + 1) * HEIGHT);
+			Rectangle(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, startX + m_Map[i]->fX + TILESIZEX, StartY + m_Map[i]->fY + TILESIZEY);
 
-			}
-			else
-				BitMapManager::GetSingleton()->GetImg((MAP)g_map[i][j])->Draw(hdc, startX + j * WIDTH, StartY + i * HEIGHT, 1, 1);
-			
 		}
+		else
+			BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileType)->Draw(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, 1, 1);
 	}
 }
 
@@ -67,13 +82,14 @@ void Maptool::Save()
 	}
 
 	HANDLE hFile = CreateFile(OFN.lpstrFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-	for (int i = 0; i < 13; i++)
+	for (int i = 0; i < m_Map.size(); i++)
 	{
-		for (int j = 0; j < 13; j++)
-		{
-			DWORD writeB;
-			WriteFile(hFile, &g_map[i][j], sizeof(int), &writeB, NULL);
-		}
+
+		DWORD writeB;
+		WriteFile(hFile, &m_Map[i]->fX, sizeof(float), &writeB, NULL);
+		WriteFile(hFile, &m_Map[i]->fY, sizeof(float), &writeB, NULL);
+		WriteFile(hFile, &m_Map[i]->eTileType, sizeof(int), &writeB, NULL);
+
 	}
 	CloseHandle(hFile);
 	InvalidateRect(m_hWnd, NULL, false);
@@ -81,17 +97,28 @@ void Maptool::Save()
 
 void Maptool::Load(LPCWSTR Flie)
 {
+	Clear();
+	SetMap();
 	HANDLE hFile = CreateFile(Flie, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	for (int i = 0; i < 13; i++)
+	for (int i = 0; i < m_Map.size(); i++)
 	{
-		for (int j = 0; j < 13; j++)
-		{
-			DWORD readB;
-			ReadFile(hFile, &g_map[i][j], sizeof(int), &readB, NULL);
-		}
+		DWORD readB;
+		ReadFile(hFile, &m_Map[i]->fX, sizeof(float), &readB, NULL);
+		ReadFile(hFile, &m_Map[i]->fY, sizeof(float), &readB, NULL);
+		ReadFile(hFile, &m_Map[i]->eTileType, sizeof(int), &readB, NULL);
 	}
 	CloseHandle(hFile);
 	InvalidateRect(m_hWnd, NULL, false);
+}
+
+void Maptool::Clear()
+{
+	for (vector<Tile*>::iterator it = m_Map.begin(); it != m_Map.end(); it++)
+
+	{
+		delete (*it);
+	}
+	m_Map.clear();
 }
 
 Maptool::~Maptool()

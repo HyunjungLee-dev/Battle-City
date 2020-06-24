@@ -13,8 +13,16 @@ void Enemy::Init()
 
 void Enemy::EnemyIconRender(HDC hdc,int Startx ,int StartY)
 {
-	
-	BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->Draw(hdc, Startx , StartY, 1, 1);
+	int X = Startx;
+	int Y = StartY;
+	SIZE Size = BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->GetSize();
+
+	for (int i = 0; i < m_iTankNum*0.5; i++)
+	{
+		BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->Draw(hdc, X, Y, 1, 1);
+		BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->Draw(hdc, X + Size.cx, Y, 1, 1);
+		Y += Size.cy;
+	}
 }
 
 Enemy::~Enemy()

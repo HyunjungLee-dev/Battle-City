@@ -4,9 +4,10 @@
 using namespace std;
 
 
-#define WIDTH 33
-#define HEIGHT 25
-
+#define TILESIZEX 33
+#define TILESIZEY 25
+#define TILEX 13
+#define TILEY 13
 
 
 
@@ -15,9 +16,9 @@ enum MAP
 	MAPWIDTH = 13,
 	MAPHEIGHT = 13,
 
-	MAP_NONE=-1,
+	MAP_NONE = -1,
 
-	MAP_BLOCK ,
+	MAP_BLOCK,
 	MAP_BLOCKT,
 	MAP_BLOCKL,
 	MAP_BLOCKB,
@@ -77,8 +78,8 @@ enum TANK
 
 enum OBJECT
 {
-	OBJE_START=0,
-	OBJE_ENEMY=0,
+	OBJE_START = 0,
+	OBJE_ENEMY = 0,
 	OBJE_EXPLOSION00,
 	OBJE_EXPLOSION01,
 	OBJE_EXPLOSION02,
@@ -90,6 +91,7 @@ enum OBJECT
 	OBJE_SHIELD01,
 	OBJE_STAGE,
 	OBJE_TITLE,
+	OBJE_APPEAR,
 	OBJE_END
 };
 
@@ -103,16 +105,30 @@ enum GAMESTATE
 	GAMEEND,
 };
 
+enum TANKSTATE
+{
+	TANKAPPEAR,
+	TANKMOVE,
+};
+
 enum TYPE
 {
 	ENEMY,
 	PLAYER
 };
 
-struct Tank
+enum DIRECTION
 {
-	RECT Rct;
-	float X;
-	float Y;
-	TYPE TankType;
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	NONE
+};
+
+struct Tile
+{
+	float fX;
+	float fY;
+	int eTileType;
 };

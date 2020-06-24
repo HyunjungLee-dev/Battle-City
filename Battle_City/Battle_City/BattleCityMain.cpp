@@ -77,7 +77,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		{
 		case 100: //SAVE
 		{
-			g_game.GetMapTool()->Save();
+			//g_game.GetMapTool()->Save();
 		}
 		break;
 		case 101://load
@@ -90,12 +90,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_LBUTTONDOWN:
 	{
-		POINT pt;
+		/*POINT pt;
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
 
 		g_game.GetMapTool()->Create(pt);
-		break;
+		break;*/
 	}
 	return 0;
 	case WM_RBUTTONDOWN:
