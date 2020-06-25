@@ -18,8 +18,8 @@ void Player::Init()
 	//Tank
 	m_edirection = UP;
 	m_eTankimg = T_PLAYER_UP_0;
-	m_iX =  4 * TILESIZEX;
-	m_iY = 12 * TILESIZEY;
+	m_pos.m_iX =  4 * TILESIZEX;
+	m_pos.m_iY = 12 * TILESIZEY;
 	m_eTankType = PLAYER;
 	m_eTState = TANKAPPEAR;
 }
@@ -36,16 +36,16 @@ void Player::Move(vector<Tile*> v)
 		switch (m_edirection)
 		{
 		case UP:
-			m_iY -= 100 * m_fDeltaTime;
+			m_pos.m_iY -= 100 * m_fDeltaTime;
 			break;
 		case DOWN:
-			m_iY += 100 * m_fDeltaTime;
+			m_pos.m_iY += 100 * m_fDeltaTime;
 			break;
 		case LEFT:
-			m_iX -= 100 * m_fDeltaTime;
+			m_pos.m_iX -= 100 * m_fDeltaTime;
 			break;
 		case RIGHT:
-			m_iX += 100 * m_fDeltaTime;
+			m_pos.m_iX += 100 * m_fDeltaTime;
 			break;
 		default:
 			break;

@@ -1,21 +1,29 @@
 #pragma once
 #include"BitMapManager.h"
+
+struct POS
+{
+	int m_iX;
+	int m_iY;
+};
 class Tank
 {
-
 protected:
 	RECT Rct;
 	DIRECTION m_edirection;
-	float m_iX, m_iY;
+	POS m_pos;
 	TYPE m_eTankType;
 	TANK m_eTankimg;
 	TANKSTATE m_eTState;
+	int index;
 public:
 	virtual void Init() = 0;
 	virtual void TankImg() = 0;
 	virtual void KeyCheck(vector<Tile*> v) = 0;
 	bool Movable(vector<Tile*> v, DIRECTION direction);
 	void Render(HDC hdc, int StartX, int StartY);
+	POS Getpos() { return m_pos; }
+	int Getindex() { return index; }
 	Tank();
 	virtual ~Tank();
 };
