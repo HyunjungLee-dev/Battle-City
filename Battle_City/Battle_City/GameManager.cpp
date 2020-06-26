@@ -277,7 +277,7 @@ void GameManager::MapRender()
 	m_Map->Render(m_backbufferDC, MapStartX, MapStartY);
 
 
-	wsprintf(str, TEXT("Tank pos x : %d  y : %d"), m_Player.Getpos().m_iX, m_Player.Getpos().m_iY);
+	wsprintf(str, TEXT("Tank pos x : %d  y : %d"), (int)m_Player.Getpos().m_iX, (int)m_Player.Getpos().m_iY);
 	m_Font.Text(100, 400, str, 0x00000000);
 	wsprintf(str, TEXT("Tank index %d"), m_Player.Getindex());
 	m_Font.Text(95, 380, str, 0x00000000);

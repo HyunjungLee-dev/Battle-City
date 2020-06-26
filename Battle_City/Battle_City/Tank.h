@@ -3,8 +3,8 @@
 
 struct POS
 {
-	int m_iX;
-	int m_iY;
+	float m_iX;
+	float m_iY;
 };
 class Tank
 {
@@ -22,6 +22,9 @@ public:
 	virtual void KeyCheck(vector<Tile*> v) = 0;
 	bool Movable(vector<Tile*> v, DIRECTION direction);
 	void Render(HDC hdc, int StartX, int StartY);
+
+	bool isWallfornt(vector<Tile*> v, int num);
+
 	POS Getpos() { return m_pos; }
 	int Getindex() { return index; }
 	Tank();

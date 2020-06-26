@@ -22,6 +22,7 @@ void Player::Init()
 	m_pos.m_iY = 12 * TILESIZEY;
 	m_eTankType = PLAYER;
 	m_eTState = TANKAPPEAR;
+	//Rct = { (int)m_pos.m_iX ,(int)m_pos.m_iY ,(int)m_pos.m_iX + TILESIZEX,(int)m_pos.m_iY + TILESIZEY };
 }
 
 void Player::Update(vector<Tile*> v)
@@ -51,7 +52,6 @@ void Player::Move(vector<Tile*> v)
 			break;
 		}
 	}
-
 }
 
 void Player::KeyCheck(vector<Tile*> v)
