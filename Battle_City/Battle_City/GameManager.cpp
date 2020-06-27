@@ -97,6 +97,7 @@ void GameManager::Render()
 	{
 		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
 		MapRender();
+	//	Rectangle(m_backbufferDC, MapStartX + m_Player.GetRect().left, MapStartY + m_Player.GetRect().top, MapStartX + m_Player.GetRect().right, MapStartY + m_Player.GetRect().bottom);
 		m_Player.Render(m_backbufferDC, MapStartX, MapStartY);
 		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, 0, 1);
 	}

@@ -27,6 +27,7 @@ public:
 
 	POS Getpos() { return m_pos; }
 	int Getindex() { return index; }
+	RECT GetRect() { return Rct; }
 	Tank();
 	virtual ~Tank();
 };

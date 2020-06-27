@@ -4,8 +4,8 @@
 using namespace std;
 
 
-#define WIDTH 33
-#define HEIGHT 25
+#define TILESIZEX 33
+#define TILESIZEY 25
 #define TILEX 13
 #define TILEY 13
 
@@ -130,5 +130,10 @@ struct Tile
 {
 	float fX;
 	float fY;
-	int eTileType;
+	float fSizeX;
+	float fSizeY;
+
+	int eTileID;
+
+	RECT Rct;
 };

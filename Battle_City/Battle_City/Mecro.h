@@ -130,5 +130,10 @@ struct Tile
 {
 	float fX;
 	float fY;
-	int eTileType;
+	float fSizeX;
+	float fSizeY;
+
+	int eTileID;
+
+	RECT Rct;
 };

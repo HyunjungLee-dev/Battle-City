@@ -19,25 +19,47 @@ void Maptool::SetMap()
 		for (int j = 0; j < TILEX; j++)
 		{
 			m_Map.push_back(new Tile);
-			m_Map.back()->eTileType = MAP_NONE;
-			m_Map.back()->fX = j * WIDTH;
-			m_Map.back()->fY = i * HEIGHT;
+			m_Map.back()->eTileID = MAP_NONE;
+			m_Map.back()->fX = j * TILESIZEX;
+			m_Map.back()->fY = i * TILESIZEY;
+			m_Map.back()->fSizeX = TILESIZEX;
+			m_Map.back()->fSizeY = TILESIZEY;
+			m_Map.back()->Rct = {
+				long(m_Map.back()->fX),long(m_Map.back()->fY),long(m_Map.back()->fX + TILESIZEX),long( m_Map.back()->fY + TILESIZEY)
+			};
 		}
 	}
 }
 
 void Maptool::Create(POINT pt)
 {
-	int index = (pt.y / HEIGHT) * TILEX + (pt.x / WIDTH);
+	int index = (pt.y / TILESIZEY) * TILEX + (pt.x / TILESIZEX);
 
-	if ((pt.x < WIDTH * 13 && pt.x > 0) && (pt.y < HEIGHT * 13 && pt.y > 0))
+	if ((pt.x < TILESIZEX * 13 && pt.x > 0) && (pt.y < TILESIZEY * 13 && pt.y > 0))
 	{
-		if (m_Map[index]->eTileType >= MAP_ENDFALGE)
-			m_Map[index]->eTileType = MAP_NONE;
+		if (m_Map[index]->eTileID >= MAP_ENDFALGE)
+			m_Map[index]->eTileID = MAP_NONE;
 		else
 		{
-
-			m_Map[index]->eTileType++;
+			m_Map[index]->eTileID++;
+			if (m_Map[index]->eTileID == MAP_BLOCKT || m_Map[index]->eTileID == MAP_GBLOCKT)
+				m_Map[index]->Rct.bottom = long(m_Map[index]->fY + TILESIZEY * 0.5);
+			else if (m_Map[index]->eTileID == MAP_BLOCKL || m_Map[index]->eTileID == MAP_GBLOCKL)
+				m_Map[index]->Rct.right = long(m_Map[index]->fX + TILESIZEX * 0.5);
+			else if (m_Map[index]->eTileID == MAP_BLOCKB || m_Map[index]->eTileID == MAP_GBLOCKB)
+			{
+				m_Map[index]->Rct.top = long(m_Map[index]->fY + TILESIZEY * 0.5);
+				m_Map[index]->Rct.bottom = long(m_Map[index]->Rct.top + TILESIZEY * 0.5);
+			}
+			else if (m_Map[index]->eTileID == MAP_BLOCKR || m_Map[index]->eTileID == MAP_GBLOCKR)
+			{
+				m_Map[index]->Rct.left = long(m_Map[index]->fX + TILESIZEX * 0.5);
+				m_Map[index]->Rct.right = long(m_Map[index]->Rct.left + TILESIZEX * 0.5);
+			}
+			else
+				m_Map[index]->Rct = {
+							long(m_Map[index]->fX),long(m_Map[index]->fY),long(m_Map[index]->fX + TILESIZEX),long(m_Map[index]->fY + TILESIZEY)
+			};
 		}
 		InvalidateRect(m_hWnd, NULL, true);
 	}
@@ -48,13 +70,13 @@ void Maptool::Render(HDC hdc, int startX, int StartY)
 
 	for (int i = 0; i < m_Map.size(); i++)
 	{
-		if (m_Map[i]->eTileType == MAP_NONE)
+		if (m_Map[i]->eTileID == MAP_NONE)
 		{
-			Rectangle(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, startX + m_Map[i]->fX + WIDTH, StartY + m_Map[i]->fY + HEIGHT);
+			Rectangle(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, startX + m_Map[i]->fX + TILESIZEX, StartY + m_Map[i]->fY + TILESIZEY);
 
 		}
 		else
-			BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileType)->Draw(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, 1, 1);
+			BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileID)->Draw(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, 1, 1);
 	}
 }
 
@@ -86,7 +108,10 @@ void Maptool::Save()
 		DWORD writeB;
 		WriteFile(hFile, &m_Map[i]->fX, sizeof(float), &writeB, NULL);
 		WriteFile(hFile, &m_Map[i]->fY, sizeof(float), &writeB, NULL);
-		WriteFile(hFile, &m_Map[i]->eTileType, sizeof(int), &writeB, NULL);
+		WriteFile(hFile, &m_Map[i]->eTileID, sizeof(int), &writeB, NULL);
+		WriteFile(hFile, &m_Map[i]->fSizeX, sizeof(float), &writeB, NULL);
+		WriteFile(hFile, &m_Map[i]->fSizeY, sizeof(float), &writeB, NULL);
+		WriteFile(hFile, &m_Map[i]->Rct, sizeof(RECT), &writeB, NULL);
 
 	}
 	CloseHandle(hFile);
@@ -103,7 +128,10 @@ void Maptool::Load(LPCWSTR Flie)
 		DWORD readB;
 		ReadFile(hFile, &m_Map[i]->fX, sizeof(float), &readB, NULL);
 		ReadFile(hFile, &m_Map[i]->fY, sizeof(float), &readB, NULL);
-		ReadFile(hFile, &m_Map[i]->eTileType, sizeof(int), &readB, NULL);
+		ReadFile(hFile, &m_Map[i]->eTileID, sizeof(int), &readB, NULL);
+		ReadFile(hFile, &m_Map[i]->fSizeX, sizeof(float), &readB, NULL);
+		ReadFile(hFile, &m_Map[i]->fSizeY, sizeof(float), &readB, NULL);
+		ReadFile(hFile, &m_Map[i]->Rct, sizeof(RECT), &readB, NULL);
 	}
 	CloseHandle(hFile);
 	InvalidateRect(m_hWnd, NULL, false);

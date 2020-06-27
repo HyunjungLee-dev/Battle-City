@@ -22,7 +22,7 @@ void Player::Init()
 	m_pos.m_iY = 12 * TILESIZEY;
 	m_eTankType = PLAYER;
 	m_eTState = TANKAPPEAR;
-	//Rct = { (int)m_pos.m_iX ,(int)m_pos.m_iY ,(int)m_pos.m_iX + TILESIZEX,(int)m_pos.m_iY + TILESIZEY };
+	Rct = { (long)m_pos.m_iX  ,(long)m_pos.m_iY ,(long)m_pos.m_iX + TILESIZEX ,(long)m_pos.m_iY+ TILESIZEY };
 }
 
 void Player::Update(vector<Tile*> v)
@@ -37,21 +37,23 @@ void Player::Move(vector<Tile*> v)
 		switch (m_edirection)
 		{
 		case UP:
-			m_pos.m_iY -= 100 * m_fDeltaTime;
+			m_pos.m_iY -= 50 * m_fDeltaTime;
 			break;
 		case DOWN:
-			m_pos.m_iY += 100 * m_fDeltaTime;
+			m_pos.m_iY += 50 * m_fDeltaTime;
 			break;
 		case LEFT:
-			m_pos.m_iX -= 100 * m_fDeltaTime;
+			m_pos.m_iX -= 50 * m_fDeltaTime;
 			break;
 		case RIGHT:
-			m_pos.m_iX += 100 * m_fDeltaTime;
+			m_pos.m_iX += 50 * m_fDeltaTime;
 			break;
 		default:
 			break;
 		}
 	}
+
+	Rct = { (long)m_pos.m_iX  ,(long)m_pos.m_iY ,(long)m_pos.m_iX + TILESIZEX ,(long)m_pos.m_iY + TILESIZEY };
 }
 
 void Player::KeyCheck(vector<Tile*> v)

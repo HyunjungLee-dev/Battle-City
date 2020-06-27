@@ -19,21 +19,24 @@ bool Tank::isWallfornt(vector<Tile*> v, int num)
 {
 	int x[8];
 	int y[8];
+	RECT tmp;
 
-	x[0] = x[3] = x[5] = m_pos.m_iX + 3;
+	x[0] = x[3] = x[5] = m_pos.m_iX +5;
 	x[1] = x[6] = x[0] + TILESIZEX * 0.5 ;
 	x[2] = x[4] = x[7] = x[0] + TILESIZEX * 0.7;
 
-	y[0] = y[1] = y[2] = m_pos.m_iY + 3;
+	y[0] = y[1] = y[2] = m_pos.m_iY + 5 ;
 	y[3] = y[4] = y[0] + TILESIZEY * 0.5;
 	y[5] = y[6] = y[7] = y[0] + TILESIZEY * 0.7;
 
 	
 		index = (int)(y[num] / TILESIZEY) * TILEX + (int)(x[num] / TILESIZEX);
-		if (v[index]->eTileType != (int)MAP_NONE)
+		if (v[index]->eTileID != (int)MAP_NONE)
 		{
+			if(IntersectRect(&tmp, &v[index]->Rct, &Rct))
 				return false;
 		}
+		
 
 	return true;
 }
