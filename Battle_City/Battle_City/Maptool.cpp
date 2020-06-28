@@ -75,7 +75,7 @@ void Maptool::Render(HDC hdc, int startX, int StartY)
 	{
 		if (m_Map[i]->eTileID == MAP_NONE)
 		{
-			Rectangle(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, startX + m_Map[i]->fX + TILESIZEX, StartY + m_Map[i]->fY + TILESIZEY);
+			//Rectangle(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, startX + m_Map[i]->fX + TILESIZEX, StartY + m_Map[i]->fY + TILESIZEY);
 
 		}
 		else

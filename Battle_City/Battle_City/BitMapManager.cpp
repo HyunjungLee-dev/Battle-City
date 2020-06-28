@@ -75,13 +75,16 @@ void BitMapManager::ObjectImgLoad()
 	m_ObjectImglist.at(OBJE_EXPLOSION02)->ImgLoad(BufferDC, L"Res//explosion_02.bmp");
 	m_ObjectImglist.at(OBJE_EXPLOSION03)->ImgLoad(BufferDC, L"Res//explosion_03.bmp");
 	m_ObjectImglist.at(OBJE_EXPLOSION04)->ImgLoad(BufferDC, L"Res//explosion_04.bmp");
-	m_ObjectImglist.at(OBJE_MISSILE)->ImgLoad(BufferDC, L"Res//missile_00.bmp");
+	m_ObjectImglist.at(OBJE_BULLET)->ImgLoad(BufferDC, L"Res//missile_00.bmp");
 	m_ObjectImglist.at(OBJE_PLAYER)->ImgLoad(BufferDC, L"Res//player_icon.bmp");
 	m_ObjectImglist.at(OBJE_SHIELD00)->ImgLoad(BufferDC, L"Res//shield_00.bmp");
 	m_ObjectImglist.at(OBJE_SHIELD01)->ImgLoad(BufferDC, L"Res//shield_01.bmp");
 	m_ObjectImglist.at(OBJE_STAGE)->ImgLoad(BufferDC, L"Res//stage_icon.bmp");
 	m_ObjectImglist.at(OBJE_TITLE)->ImgLoad(BufferDC, L"Res//Title.bmp");
-	m_ObjectImglist.at(OBJE_APPEAR)->ImgLoad(BufferDC, L"Res//appear.bmp");
+	m_ObjectImglist.at(OBJE_APPEAR0)->ImgLoad(BufferDC, L"Res//appear0.bmp");
+	m_ObjectImglist.at(OBJE_APPEAR1)->ImgLoad(BufferDC, L"Res//appear1.bmp");
+	m_ObjectImglist.at(OBJE_APPEAR2)->ImgLoad(BufferDC, L"Res//appear2.bmp");
+	m_ObjectImglist.at(OBJE_APPEAR3)->ImgLoad(BufferDC, L"Res//appear3.bmp");
 }
 
 void BitMapManager::Clear()

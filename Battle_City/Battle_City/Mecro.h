@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include<vector>
+#include<queue>
 using namespace std;
 
 
@@ -85,13 +86,16 @@ enum OBJECT
 	OBJE_EXPLOSION02,
 	OBJE_EXPLOSION03,
 	OBJE_EXPLOSION04,
-	OBJE_MISSILE,
+	OBJE_BULLET,
 	OBJE_PLAYER,
 	OBJE_SHIELD00,
 	OBJE_SHIELD01,
 	OBJE_STAGE,
 	OBJE_TITLE,
-	OBJE_APPEAR,
+	OBJE_APPEAR0,
+	OBJE_APPEAR1,
+	OBJE_APPEAR2,
+	OBJE_APPEAR3,
 	OBJE_END
 };
 
@@ -108,6 +112,7 @@ enum GAMESTATE
 enum TANKSTATE
 {
 	TANKAPPEAR,
+	TANKSHIELD,
 	TANKMOVE,
 };
 
@@ -136,4 +141,10 @@ struct Tile
 	int eTileID;
 
 	RECT Rct;
+};
+
+struct POS
+{
+	float m_iX;
+	float m_iY;
 };

@@ -24,8 +24,11 @@ void GameManager::Init(HWND hWnd)
 	m_Map->Init(hWnd);
 	m_Font.Init();
 
-	m_Player.Init();
-	m_Enemy.Init();
+	m_Player = new Player; // 탱크팩토리?
+	m_Enemy = new Enemy;
+
+	m_Player->Init();
+	m_Enemy->Init();
 
 	m_iHiScore = 20000;
 	m_iTitleY = 450;
@@ -54,7 +57,7 @@ void GameManager::Update()
 	}
 	else if (m_eState == GAMEPLAY)
 	{
-		m_Player.Update(m_Map->GetMap());
+		m_Player->Update(m_Map->GetMap());
 	}
 	else
 	{
@@ -98,7 +101,7 @@ void GameManager::Render()
 		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
 		MapRender();
 	//	Rectangle(m_backbufferDC, MapStartX + m_Player.GetRect().left, MapStartY + m_Player.GetRect().top, MapStartX + m_Player.GetRect().right, MapStartY + m_Player.GetRect().bottom);
-		m_Player.Render(m_backbufferDC, MapStartX, MapStartY);
+		m_Player->Render(m_backbufferDC, MapStartX, MapStartY);
 		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, 0, 1);
 	}
 	else
@@ -126,10 +129,10 @@ void GameManager:: Title()
 
 	BitMapManager::GetSingleton()->GetImg(OBJE_TITLE)->Draw(m_backbufferDC, m_ClientRect.right*0.11, m_ClientRect.bottom*0.2, 0.7, 0.7);
 
-	if(m_Player.GetScore() == 0)
-		wsprintf(str, TEXT("I-%8d0"), m_Player.GetScore());
+	if(m_Player->GetScore() == 0)
+		wsprintf(str, TEXT("I-%8d0"), m_Player->GetScore());
 	else
-		wsprintf(str, TEXT("I-%8d"), m_Player.GetScore());
+		wsprintf(str, TEXT("I-%8d"), m_Player->GetScore());
 	m_Font.Text(m_ClientRect.right*0.1, m_ClientRect.bottom*0.1, str, 0x00ffffff);
 	wsprintf(str, TEXT("HI-%8d"), m_iHiScore);
 	m_Font.Text(m_ClientRect.right*0.4, m_ClientRect.bottom*0.1, str, 0x00ffffff);
@@ -260,13 +263,13 @@ void GameManager::MapRender()
 	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, PATCOPY);
 
 	//적
-	m_Enemy.EnemyIconRender(m_backbufferDC, m_ClientRect.right*0.9, m_ClientRect.bottom*0.15);
+	m_Enemy->EnemyIconRender(m_backbufferDC, m_ClientRect.right*0.9, m_ClientRect.bottom*0.15);
 
 
 	//플레이어
 	m_Font.Text(m_ClientRect.right*0.9, m_ClientRect.bottom*0.5, L"IP", 0x00000000);
 	BitMapManager::GetSingleton()->GetImg(OBJE_PLAYER)->Draw(m_backbufferDC, m_ClientRect.right*0.9, m_ClientRect.bottom*0.55, 1, 1);
-	wsprintf(str, TEXT("%d"),m_Player.GetLife());
+	wsprintf(str, TEXT("%d"),m_Player->GetLife());
 	m_Font.Text(m_ClientRect.right*0.9 + BitMapManager::GetSingleton()->GetImg(OBJE_PLAYER)->GetSize().cx, m_ClientRect.bottom*0.55, str, 0x00000000);
 
 	//스테이지
@@ -278,10 +281,10 @@ void GameManager::MapRender()
 	m_Map->Render(m_backbufferDC, MapStartX, MapStartY);
 
 
-	wsprintf(str, TEXT("Tank pos x : %d  y : %d"), (int)m_Player.Getpos().m_iX, (int)m_Player.Getpos().m_iY);
+	wsprintf(str, TEXT("Tank pos x : %d  y : %d"), (int)m_Player->Getpos().m_iX, (int)m_Player->Getpos().m_iY);
 	m_Font.Text(100, 400, str, 0x00000000);
-	wsprintf(str, TEXT("Tank index %d"), m_Player.Getindex());
-	m_Font.Text(95, 380, str, 0x00000000);
+	//wsprintf(str, TEXT("Tank index %d"), m_Player->Getindex());
+	//m_Font.Text(95, 380, str, 0x00000000);
 
 	SelectObject(m_backbufferDC, oldBrush);
 	DeleteObject(myBrush);
@@ -291,4 +294,6 @@ void GameManager::MapRender()
 GameManager::~GameManager()
 {
 	delete m_Map;
+	delete m_Player;
+	delete m_Enemy;
 }

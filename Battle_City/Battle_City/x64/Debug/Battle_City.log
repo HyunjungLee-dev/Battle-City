@@ -1,7 +1,4 @@
-﻿  Maptool.cpp
-c:\users\lee\desktop\battle-city (2)\battle_city\battle_city\maptool.cpp(23): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\lee\desktop\battle-city (2)\battle_city\battle_city\maptool.cpp(24): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\lee\desktop\battle-city (2)\battle_city\battle_city\maptool.cpp(72): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\lee\desktop\battle-city (2)\battle_city\battle_city\maptool.cpp(76): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\lee\desktop\battle-city (2)\battle_city\battle_city\maptool.cpp(83): warning C4101: 'str' :참조되지 않은 지역 변수입니다.
-  Battle_City.vcxproj -> C:\Users\LEE\Desktop\Battle-City (2)\Battle_City\x64\Debug\Battle_City.exe
+﻿  Bullet.cpp
+d:\github\battle-city\battle_city\battle_city\bullet.cpp(17): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\battle-city\battle_city\battle_city\bullet.cpp(54): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Battle_City.vcxproj -> D:\Github\Battle-City\Battle_City\x64\Debug\Battle_City.exe

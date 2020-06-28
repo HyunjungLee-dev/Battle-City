@@ -7,10 +7,6 @@ private:
 	int m_iScore;
 	int m_iLife;
 
-	DWORD	m_dwLastTime;
-	DWORD	m_dwCurTime;
-	float	m_fDeltaTime;
-
 public:
 	virtual void Init();
 	void Update(vector<Tile*> v);

@@ -18,8 +18,8 @@ private:
 	float	m_fDeltaTime;
 
 	Font m_Font;
-	Player m_Player;
-	Enemy m_Enemy;
+	Player* m_Player;
+	Enemy* m_Enemy;
 
 	int MapStartX, MapStartY;
 

@@ -1,12 +1,8 @@
 #pragma once
-#include"BitMapManager.h"
+#include"Bullet.h"
 
-struct POS
-{
-	float m_iX;
-	float m_iY;
-};
-class Tank
+
+class Tank 
 {
 protected:
 	RECT Rct;
@@ -15,7 +11,13 @@ protected:
 	TYPE m_eTankType;
 	TANK m_eTankimg;
 	TANKSTATE m_eTState;
-	int index;
+
+	Bullet* m_bullet;
+
+	DWORD	m_dwLastTime;
+	DWORD	m_dwCurTime;
+	float	m_fDeltaTime;
+
 public:
 	virtual void Init() = 0;
 	virtual void TankImg() = 0;
@@ -26,7 +28,7 @@ public:
 	bool isWallfornt(vector<Tile*> v, int num);
 
 	POS Getpos() { return m_pos; }
-	int Getindex() { return index; }
+	//int Getindex() { return index; }
 	RECT GetRect() { return Rct; }
 	Tank();
 	virtual ~Tank();
