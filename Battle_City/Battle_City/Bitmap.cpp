@@ -45,6 +45,9 @@ void Bitmap::Draw(HDC hdc) //ÀüÃ¼
 	BitBlt(hdc, 0, 0, m_size.cx, m_size.cy, MemDC, 0, 0, SRCCOPY);
 }
 
+
+
+
 void Bitmap::Release()
 {
 	SelectObject(MemDC, m_OldBitMap);

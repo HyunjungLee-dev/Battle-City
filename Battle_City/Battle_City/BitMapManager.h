@@ -11,7 +11,6 @@ private:
 	vector<Bitmap*> m_TankImglist;
 	vector<Bitmap*> m_ObjectImglist;
 	HDC BufferDC;
-
 public:
 	void Init(HWND hWnd);
 	void MapImgLoad();

@@ -34,7 +34,7 @@ void Player::Update(vector<Tile*> v)
 
 	if (m_eTState != TANKAPPEAR)
 	{
-		m_bullet->Shoot();
+		m_bullet->Shoot(m_edirection,v);
 		KeyCheck(v);
 	}
 }
@@ -95,7 +95,7 @@ void Player::KeyCheck(vector<Tile*> v)
 
 	if (GetAsyncKeyState(VK_SPACE) & 0x0001) // 장애물에 부딪히지 않으며 생성 안함, 큐로 해도 괜찮을듯,,,..한데
 	{
-		m_bullet->Create(m_pos);
+		m_bullet->Create(m_pos, m_edirection);
 	}
 
 

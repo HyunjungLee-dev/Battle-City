@@ -2,6 +2,8 @@
 #include <Windows.h>
 #include<vector>
 #include<queue>
+#include<math.h>
+#define PI 3.141592
 using namespace std;
 
 

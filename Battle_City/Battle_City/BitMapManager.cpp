@@ -87,6 +87,8 @@ void BitMapManager::ObjectImgLoad()
 	m_ObjectImglist.at(OBJE_APPEAR3)->ImgLoad(BufferDC, L"Res//appear3.bmp");
 }
 
+
+
 void BitMapManager::Clear()
 {
 	for (vector<Bitmap*>::iterator it = m_MapImglist.begin(); it != m_MapImglist.end(); it++)
