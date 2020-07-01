@@ -1,13 +1,15 @@
 #pragma once
 #include"BitMapManager.h"
-class Enemy
+#include "Tank.h"
+class Enemy : public Tank
 {
 private:
-	int m_iTankNum;
 public:
-	void Init();
-	void EnemyIconRender(HDC hdc,int StartX, int StrtY);
+	virtual void Init();
+	virtual void TankImg();
+	void Create();
+	void Update(vector<Tile*> v);
 	Enemy();
-	~Enemy();
+	virtual ~Enemy();
 };
 

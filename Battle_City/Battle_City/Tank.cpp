@@ -8,7 +8,7 @@ Tank::Tank()
 }
 
 
-void Tank::Render(HDC hdc, int StartX, int StartY)
+void Tank::Render(HDC hdc)
 {
 	static int appeartype = OBJE_APPEAR0;
 	static int Shieldtype = OBJE_SHIELD00;
@@ -18,7 +18,8 @@ void Tank::Render(HDC hdc, int StartX, int StartY)
 	if (m_eTState == TANKAPPEAR)
 	{
 		Time += m_fDeltaTime;
-		BitMapManager::GetSingleton()->GetImg((OBJECT)appeartype)->Draw(hdc, StartX + m_pos.m_iX, StartY + m_pos.m_iY - 6, 2, 2);
+		
+		BitMapManager::GetSingleton()->GetImg((OBJECT)appeartype)->Draw(hdc, STARTX + m_pos.m_iX + 5, STARTY + m_pos.m_iY + 4, 1.4, 1.4);
 		if (Time > 0.1f)
 		{
 			appeartype++;
@@ -29,7 +30,10 @@ void Tank::Render(HDC hdc, int StartX, int StartY)
 			}
 			if (RepeatNum == 4)
 			{
-				m_eTState = TANKSHIELD;
+				if (m_eTankType == PLAYER)
+					m_eTState = TANKSHIELD;
+				else
+					m_eTState = TANKMOVE;
 				RepeatNum = 0;
 			}
 			Time = 0.0f;
@@ -40,8 +44,8 @@ void Tank::Render(HDC hdc, int StartX, int StartY)
 	{
 		Time += m_fDeltaTime;
 
-		BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, StartX + m_pos.m_iX, StartY + m_pos.m_iY, 1, 1);
-		BitMapManager::GetSingleton()->GetImg((OBJECT)Shieldtype)->Draw(hdc, StartX + m_pos.m_iX, StartY + m_pos.m_iY, 1, 1);
+		BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
+		BitMapManager::GetSingleton()->GetImg((OBJECT)Shieldtype)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
 
 		if (Time > 0.1f)
 		{
@@ -62,10 +66,17 @@ void Tank::Render(HDC hdc, int StartX, int StartY)
 	}
 	else
 	{
-		BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, StartX + m_pos.m_iX, StartY + m_pos.m_iY, 1, 1);
-		m_bullet->Render(StartX, StartY);
+		BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
+		m_bullet->Render();
 	}
 
+}
+
+void Tank::SetNotIntersect(RECT Rect, const RECT Hold)
+{
+	/*RECT Inter;
+
+	if()*/
 }
 
 
@@ -81,17 +92,79 @@ bool Tank::isWallfornt(vector<Tile*> v, int num)
 
 	y[0] = y[1] = y[2] = m_pos.m_iY + 5;
 	y[3] = y[4] = y[0] + TILESIZEY * 0.5;
-	y[5] = y[6] = y[7] = y[0] + TILESIZEY * 0.7;
+	y[5] = y[6] = y[7] = y[0] + TILESIZEY  * 0.7;
 	
-		int index = (int)(y[num] / TILESIZEY) * TILEX + (int)(x[num] / TILESIZEX);
+		index = (int)(y[num] / TILESIZEY) * TILEX + (int)(x[num] / TILESIZEX);
 		if (v[index]->eTileID != (int)MAP_NONE)
 		{
-			if(IntersectRect(&tmp, &v[index]->Rct, &Rct))
+			if (IntersectRect(&tmp, &v[index]->Rct, &Rct))
+			{
+				int InterW = tmp.right - tmp.left;
+				int InterH = tmp.bottom - tmp.top;
+
+				if (InterW > InterH)
+				{
+					if(tmp.top == v[index]->Rct.top)
+					{
+						m_pos.m_iY -= InterH;
+						Rct.top -= InterH;
+						Rct.bottom -= InterH;
+					}
+					else if (tmp.bottom == v[index]->Rct.bottom)
+					{
+						m_pos.m_iY += InterH;
+						Rct.top += InterH;
+						Rct.bottom += InterH;
+					}
+				}
+				else
+				{
+					if (tmp.left == v[index]->Rct.left)
+					{
+						m_pos.m_iX -= InterW;
+						Rct.left -= InterW;
+						Rct.right -= InterW;
+					}
+					else if (tmp.right == v[index]->Rct.right)
+					{
+						m_pos.m_iX += InterW;
+						Rct.left += InterW;
+						Rct.right += InterW;
+					}
+				}
+			
 				return false;
+			}
 		}
 		
 
 	return true;
+}
+
+void Tank::Move(vector<Tile*> v)
+{
+	if (Movable(v, m_edirection))
+	{
+		switch (m_edirection)
+		{
+		case UP:
+			m_pos.m_iY -= 100 * m_fDeltaTime;
+			break;
+		case DOWN:
+			m_pos.m_iY += 100 * m_fDeltaTime;
+			break;
+		case LEFT:
+			m_pos.m_iX -= 100 * m_fDeltaTime;
+			break;
+		case RIGHT:
+			m_pos.m_iX += 100 * m_fDeltaTime;
+			break;
+		default:
+			break;
+		}
+	}
+
+	Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY  + 3,(long)m_pos.m_iX + TILESIZEX -3  ,(long)m_pos.m_iY + TILESIZEY  - 3};
 }
 
 bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
@@ -109,7 +182,7 @@ bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
 		case DOWN:
 			if (m_pos.m_iY >= TILESIZEY * 12)
 				return false;
-			if (!isWallfornt(v, 6) || !isWallfornt(v, 5) || !isWallfornt(v, 7))
+			if (!isWallfornt(v, 6)|| !isWallfornt(v, 5) || !isWallfornt(v, 7))
 				return false;
 			else
 				return true;

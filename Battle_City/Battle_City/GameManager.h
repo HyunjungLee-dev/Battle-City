@@ -19,9 +19,9 @@ private:
 
 	Font m_Font;
 	Player* m_Player;
-	Enemy* m_Enemy;
-
-	int MapStartX, MapStartY;
+	list<Enemy*> m_Enemylist;
+	void EnemyUpdate();
+	int m_iEnemyNum;
 
 	int m_iTitleY;
 	int m_iSelect;
@@ -31,6 +31,9 @@ public:
 	void Init(HWND hWnd);
 	void Update();
 	void Render();
+	void EnemyIconRender(HDC hdc);
+	void EnemyCreate();
+	void EnemyRender(HDC hdc);
 	void Title();
 	void Stage();
 	void MapRender();

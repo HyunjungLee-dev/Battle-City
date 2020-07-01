@@ -17,18 +17,15 @@ void GameManager::Init(HWND hWnd)
 	m_backbufferDC = BitMapManager::GetSingleton()->GetBufferDC();
 
 	m_eState = GAMEWAIT;
-	MapStartX = 15;
-	MapStartY = 40;
+	m_iEnemyNum = 20;
 
 	m_Map = new Maptool;
 	m_Map->Init(hWnd);
 	m_Font.Init();
 
 	m_Player = new Player; // 탱크팩토리?
-	m_Enemy = new Enemy;
 
 	m_Player->Init();
-	m_Enemy->Init();
 
 	m_iHiScore = 20000;
 	m_iTitleY = 450;
@@ -57,6 +54,7 @@ void GameManager::Update()
 	}
 	else if (m_eState == GAMEPLAY)
 	{
+		EnemyUpdate();
 		m_Player->Update(m_Map->GetMap());
 	}
 	else
@@ -68,7 +66,7 @@ void GameManager::Update()
 
 void GameManager::Render()
 {
-	HDC hdc = GetDC(m_hWnd);
+ 	HDC hdc = GetDC(m_hWnd);
 
 	m_dwCurTime = GetTickCount();
 	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
@@ -100,13 +98,75 @@ void GameManager::Render()
 	{
 		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
 		MapRender();
-	//	Rectangle(m_backbufferDC, MapStartX + m_Player.GetRect().left, MapStartY + m_Player.GetRect().top, MapStartX + m_Player.GetRect().right, MapStartY + m_Player.GetRect().bottom);
-		m_Player->Render(m_backbufferDC, MapStartX, MapStartY);
+//		Rectangle(m_backbufferDC, MapStartX + m_Player.GetRect().left, MapStartY + m_Player.GetRect().top, MapStartX + m_Player.GetRect().right, MapStartY + m_Player.GetRect().bottom);
+		m_Player->Render(m_backbufferDC);
+		EnemyRender(m_backbufferDC);
 		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, 0, 1);
 	}
 	else
 		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc,0,0,1);
 	ReleaseDC(m_hWnd, hdc);
+}
+
+void GameManager::EnemyIconRender(HDC hdc)
+{
+	int X = m_ClientRect.right*0.9;
+	int Y = m_ClientRect.bottom*0.15;
+
+	SIZE Size = BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->GetSize();
+
+	for (int i = 0; i < m_iEnemyNum*0.5; i++)
+	{
+		BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->Draw(hdc, X, Y, 1, 1);
+		BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->Draw(hdc, X + Size.cx, Y, 1, 1);
+		Y += Size.cy;
+	}
+}
+
+void GameManager::EnemyCreate()//일정 시간이 지나면 생성
+{
+	m_dwCurTime = GetTickCount();
+	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
+
+	if (m_Enemylist.empty())
+	{
+		if (m_fDeltaTime > 1.0f)
+		{
+			m_Enemylist.push_back(new Enemy);
+			m_Enemylist.back()->Create();
+			m_dwLastTime = m_dwCurTime;
+		}
+	}
+	else
+	{
+		if (m_Enemylist.size() != m_iEnemyNum)
+		{
+			if (m_fDeltaTime > 8.0f)
+			{
+				m_Enemylist.push_back(new Enemy);
+				m_Enemylist.back()->Create();
+				m_dwLastTime = m_dwCurTime;
+			}
+		}
+	}
+}
+
+void GameManager::EnemyUpdate()
+{
+	EnemyCreate();
+	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
+	{
+		(*it)->Update(m_Map->GetMap());
+	}
+
+}
+
+void GameManager::EnemyRender(HDC hdc)
+{
+	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
+	{
+		(*it)->Render(hdc);
+	}
 }
 
 void GameManager:: Title() 
@@ -263,7 +323,7 @@ void GameManager::MapRender()
 	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, PATCOPY);
 
 	//적
-	m_Enemy->EnemyIconRender(m_backbufferDC, m_ClientRect.right*0.9, m_ClientRect.bottom*0.15);
+	EnemyIconRender(m_backbufferDC);
 
 
 	//플레이어
@@ -278,12 +338,12 @@ void GameManager::MapRender()
 	m_Font.Text(m_ClientRect.right*0.9 + 20 , m_ClientRect.bottom*0.7 + 20, str, 0x00000000);
 
 	//맵
-	m_Map->Render(m_backbufferDC, MapStartX, MapStartY);
+	m_Map->Render(m_backbufferDC);
 
 
 	wsprintf(str, TEXT("Tank pos x : %d  y : %d"), (int)m_Player->Getpos().m_iX, (int)m_Player->Getpos().m_iY);
 	m_Font.Text(100, 400, str, 0x00000000);
-	//wsprintf(str, TEXT("Tank index %d"), m_Player->Getindex());
+	//wsprintf(str, TEXT("Tank col index %d"), m_Player->Getindex());
 	//m_Font.Text(95, 380, str, 0x00000000);
 
 	SelectObject(m_backbufferDC, oldBrush);
@@ -295,5 +355,9 @@ GameManager::~GameManager()
 {
 	delete m_Map;
 	delete m_Player;
-	delete m_Enemy;
+	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
+	{
+		delete (*it);
+	}
+	m_Enemylist.clear();
 }

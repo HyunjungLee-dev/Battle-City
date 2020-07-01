@@ -1,8 +1,11 @@
 #pragma once
 #include <Windows.h>
+#include <stdlib.h>
+#include <time.h>
 #include<vector>
 #include<queue>
 #include<math.h>
+#include<list>
 #define PI 3.141592
 using namespace std;
 
@@ -11,6 +14,9 @@ using namespace std;
 #define TILESIZEY 25
 #define TILEX 13
 #define TILEY 13
+
+#define STARTX	 15
+#define STARTY	 40
 
 
 

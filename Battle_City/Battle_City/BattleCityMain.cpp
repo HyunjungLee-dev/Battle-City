@@ -11,6 +11,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 	HWND hWnd;
 	MSG Message;
 	WNDCLASS WndClass;
+	srand((unsigned int)time(NULL));
 	g_hInst = hInstance;
 	WndClass.cbClsExtra = 0;
 	WndClass.cbWndExtra = 0;

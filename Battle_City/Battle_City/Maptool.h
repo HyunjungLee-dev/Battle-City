@@ -12,7 +12,7 @@ public:
 	void Init(HWND hwnd);
 	void SetMap();
 	void Create(POINT pt);
-	void Render(HDC hdc, int startX, int StartY);
+	void Render(HDC hdc);
 	void Save();
 	void Load(LPCWSTR Flie);
 	void Clear();

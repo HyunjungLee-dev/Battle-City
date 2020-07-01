@@ -43,43 +43,43 @@ void Maptool::Create(POINT pt)
 		else
 		{
 			m_Map[index]->eTileID++;
+			m_Map[index]->Rct = {long(m_Map[index]->fX),long(m_Map[index]->fY),long(m_Map[index]->fX + TILESIZEX),long(m_Map[index]->fY + TILESIZEY) };
+
 			if (m_Map[index]->eTileID == MAP_BLOCKT || m_Map[index]->eTileID == MAP_GBLOCKT)
 				m_Map[index]->Rct.bottom = long(m_Map[index]->fY + TILESIZEY * 0.5);
 			else if (m_Map[index]->eTileID == MAP_BLOCKL || m_Map[index]->eTileID == MAP_GBLOCKL)
+			{
 				m_Map[index]->Rct.right = long(m_Map[index]->fX + TILESIZEX * 0.5);
+			}
 			else if (m_Map[index]->eTileID == MAP_BLOCKB || m_Map[index]->eTileID == MAP_GBLOCKB)
 			{
 				m_Map[index]->Rct.top = long(m_Map[index]->fY + TILESIZEY * 0.5);
-				m_Map[index]->Rct.bottom = long(m_Map[index]->Rct.top + TILESIZEY * 0.5);
 			}
 			else if (m_Map[index]->eTileID == MAP_BLOCKR || m_Map[index]->eTileID == MAP_GBLOCKR)
 			{
 				m_Map[index]->Rct.left = long(m_Map[index]->fX + TILESIZEX * 0.5);
-				m_Map[index]->Rct.right = long(m_Map[index]->Rct.left + TILESIZEX * 0.5);
+
 			}
-			else
-				m_Map[index]->Rct = {
-							long(m_Map[index]->fX),long(m_Map[index]->fY),long(m_Map[index]->fX + TILESIZEX),long(m_Map[index]->fY + TILESIZEY)
-			};
 		}
 		InvalidateRect(m_hWnd, NULL, true);
 	}
 }
 
-void Maptool::Render(HDC hdc, int startX, int StartY)
+void Maptool::Render(HDC hdc)
 {
-	RECT ret = { startX ,StartY, TILESIZEX * TILEX , TILESIZEY * TILEY };
+	RECT ret = { STARTX ,STARTY, TILESIZEX * TILEX , TILESIZEY * TILEY };
 	PatBlt(hdc, ret.left, ret.top, ret.right, ret.bottom, BLACKNESS);
 
 	for (int i = 0; i < m_Map.size(); i++)
 	{
 		if (m_Map[i]->eTileID == MAP_NONE)
 		{
-			//Rectangle(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, startX + m_Map[i]->fX + TILESIZEX, StartY + m_Map[i]->fY + TILESIZEY);
+			//Rectangle(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, STARTX + m_Map[i]->fX + TILESIZEX, STARTY + m_Map[i]->fY + TILESIZEY);
 
 		}
 		else
-			BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileID)->Draw(hdc, startX + m_Map[i]->fX, StartY + m_Map[i]->fY, 1, 1);
+			BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileID)->Draw(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, 1, 1);
+		//Rectangle(hdc, STARTX + m_Map[i]->Rct.left, STARTY + m_Map[i]->Rct.top, STARTX + m_Map[i]->Rct.right, STARTY + m_Map[i]->Rct.bottom);
 	}
 }
 

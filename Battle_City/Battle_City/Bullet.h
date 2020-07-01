@@ -6,6 +6,9 @@ class Bullet
 private:
 	queue<POS> m_bullet;
 	SIZE ImgSize;
+	DIRECTION m_direction;
+	bool m_bShoot, m_bCollision;
+	int type;
 
 	float CenterX, CenterY;
 
@@ -17,12 +20,15 @@ public:
 	~Bullet();
 
 	void Create(POS pos, DIRECTION direction);
-	void Shoot(DIRECTION direction, vector<Tile*> v);
-	void Render(int StartX, int StartY);
-	bool Collision(vector<Tile*> v);
+	void Shoot(vector<Tile*> v);
+	void ExsplosionRender(HDC hdc);
+	void Render();
+	void Collision(vector<Tile*> v);
 	bool IsPointInRect(RECT rc);
 	bool IsPointInCircle(POS point);
-	void Update();
+
+	bool GetShoot() { return m_bShoot; }
+	void Update(DIRECTION direction, vector<Tile*> v);
 	void Clear();
 };
 
