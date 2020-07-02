@@ -17,30 +17,33 @@ void GameManager::Init(HWND hWnd)
 	m_backbufferDC = BitMapManager::GetSingleton()->GetBufferDC();
 
 	m_eState = GAMEWAIT;
-	m_iEnemyNum = 20;
 
-	m_Map = new Maptool;
-	m_Map->Init(hWnd);
+
+	Maptool::GetSingleton()->Init(hWnd);
 	m_Font.Init();
 
 	m_Player = new Player; // 탱크팩토리?
 
 	m_Player->Init();
+	m_Player->SetLife();
 
 	m_iHiScore = 20000;
-	m_iTitleY = 450;
+	m_iScrollY = 450;
 	// 다시 타이틀로 돌아올때 초기화 필요
 	m_iSelect = 1;
 	m_iStage = 1;
+	m_iAllEnemyNum = 20;
+	m_iCreateEnemyNum = m_iAllEnemyNum;
+	m_ikillEnemyNum = 0;
 
-	//테스트
-	testnum = 0;
 
 	//스테이지
 	TCHAR str[128];
 	wsprintf(str, TEXT("STAGE0%d"), m_iStage);
-	m_Map->Load(str);
+	Maptool::GetSingleton()->Load(str);
 }
+
+
 
 void GameManager::Update()
 {
@@ -56,17 +59,19 @@ void GameManager::Update()
 	}
 	else if (m_eState == GAMEPLAY)
 	{
-		//Enemy
+		if (m_Player->GetLife() < 0 || Maptool::GetSingleton()->FlagCheck())
+		{
+			m_eState = GAMEOVER;
+			m_iScrollY = 450;
+		}
+		else
+		{
 			EnemyUpdate();
-
-		//Player
-			m_Player->Update(m_Map->GetMap());
+			m_Player->Update(Maptool::GetSingleton()->GetMap());
+			TankbulletCollision();
+		}
 	}
-	else
-	{
-
-	}
-	Render();
+ 	Render();
 }
 
 void GameManager::Render()
@@ -86,31 +91,62 @@ void GameManager::Render()
 
 	if (m_eState == GAMEWAIT)
 	{
-		if (m_iTitleY != 0)
+		if (m_iScrollY != 0)
 		{
 			if (m_fDeltaTime > 0.04f)
 			{
-				if (m_iTitleY <= 0)
-					m_iTitleY = 0;
+				if (m_iScrollY <= 0)
+					m_iScrollY = 0;
 				else
-					m_iTitleY -= 10;
+					m_iScrollY -= 10;
 				m_dwLastTime = m_dwCurTime;
 			}
 		}
-		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, m_iTitleY, 1);
+		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, m_iScrollY, 1);
 	}
-	else if (m_eState == GAMEPLAY)
+	else if (m_eState == GAMEPLAY )
 	{
 		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
 		MapRender();
-//		Rectangle(m_backbufferDC, MapStartX + m_Player.GetRect().left, MapStartY + m_Player.GetRect().top, MapStartX + m_Player.GetRect().right, MapStartY + m_Player.GetRect().bottom);
+		//Rectangle(m_backbufferDC, MapStartX + m_Player.GetRect().left, MapStartY + m_Player.GetRect().top, MapStartX + m_Player.GetRect().right, MapStartY + m_Player.GetRect().bottom);
 		m_Player->Render(m_backbufferDC);
 		EnemyRender(m_backbufferDC);
+		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, 0, 1);
+	}
+	else if (m_eState == GAMEOVER)
+	{
+		m_dwCurTime = GetTickCount();
+		m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
+
+		if (m_iScrollY != m_ClientRect.bottom*0.5)
+		{
+			MapRender();
+			EnemyRender(m_backbufferDC);
+
+			if (m_fDeltaTime > 0.04f)
+			{
+				if (m_iScrollY <= m_ClientRect.bottom*0.5)
+					m_iScrollY = m_ClientRect.bottom*0.5;
+				else
+					m_iScrollY -= 10;
+				m_dwLastTime = m_dwCurTime;
+			}
+			m_Font.Text(m_ClientRect.right*0.4, m_iScrollY, L"GAME", RGB(255, 187, 0));
+			m_Font.Text(m_ClientRect.right*0.4, m_iScrollY + 12, L"OVER", RGB(255, 187, 0));
+		}
+		else
+			GameOver();
 		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, 0, 1);
 	}
 	else
 		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc,0,0,1);
 	ReleaseDC(m_hWnd, hdc);
+}
+
+void GameManager::GameOver()
+{
+	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+
 }
 
 void GameManager::EnemyIconRender(HDC hdc)
@@ -120,11 +156,15 @@ void GameManager::EnemyIconRender(HDC hdc)
 
 	SIZE Size = BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->GetSize();
 
-	for (int i = 0; i < m_iEnemyNum*0.5; i++)
+	for (int i = 1; i <= m_iCreateEnemyNum; i++)
 	{
-		BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->Draw(hdc, X, Y, 1, 1);
-		BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->Draw(hdc, X + Size.cx, Y, 1, 1);
-		Y += Size.cy;
+		if (i % 2 == 0)
+		{
+			BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->Draw(hdc, X + Size.cx, Y, 1, 1);
+			Y += Size.cy;
+		}
+		else
+			BitMapManager::GetSingleton()->GetImg(OBJE_ENEMY)->Draw(hdc, X, Y, 1, 1);
 	}
 }
 
@@ -135,24 +175,20 @@ void GameManager::EnemyCreate()//일정 시간이 지나면 생성
 
 	if (m_Enemylist.empty())
 	{
-		if (m_fDeltaTime > 1.0f)
-		{
 			m_Enemylist.push_back(new Enemy);
 			m_Enemylist.back()->Create();
-			m_dwLastTime = m_dwCurTime;
-			testnum++;
-		}
+			m_iCreateEnemyNum--;
 	}
 	else
 	{
-		if (m_Enemylist.size() != m_iEnemyNum)
+		if ( m_iCreateEnemyNum > 0)
 		{
 			if (m_fDeltaTime > 8.0f)
 			{
 				m_Enemylist.push_back(new Enemy);
 				m_Enemylist.back()->Create();
+				m_iCreateEnemyNum--;
 				m_dwLastTime = m_dwCurTime;
-				testnum++;
 			}
 
 		}
@@ -165,7 +201,7 @@ void GameManager::EnemyUpdate()
 	TankCollision();
 	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
 	{
-		(*it)->Update(m_Map->GetMap());
+		(*it)->Update(Maptool::GetSingleton()->GetMap());
 	}
 
 }
@@ -183,7 +219,6 @@ void GameManager::TankCollision()
 	if (!m_Enemylist.empty())
 	{
 		list<Enemy*>::iterator iter = m_Enemylist.begin();
-
 		while (iter != m_Enemylist.end())
 		{
 			for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
@@ -193,14 +228,58 @@ void GameManager::TankCollision()
 					if ((*iter)->isTankfornt((*it)->GetRect()))
 					{
 						(*iter)->Changedirection();
-						(*it)-> Changedirection();
+						(*it)->Changedirection();
 						break;
 					}
+				}
+				if ((*iter)->isTankfornt(m_Player->GetRect()))
+				{
+					(*iter)->Changedirection();
+					break;
 				}
 			}
 			iter++;
 		}
 	}
+}
+
+void GameManager::TankbulletCollision()
+{
+
+	//TCHAR str[128];
+
+		for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
+		{
+			float cx = (*it)->GetCenterPos().m_iX;
+			float cy = (*it)->GetCenterPos().m_iY;
+
+			if (m_Player->GetBullet()->IsPointInCircle(cx, cy))
+			{
+				//wsprintf(str, TEXT("%d"), (*it)->GetPoint());
+				delete (*it);
+				m_Enemylist.erase(it);
+
+ 				//m_Font.Text(cx, cy, str, 0x00000000);
+	
+				m_ikillEnemyNum++;
+				break;
+			}
+
+			float pcx = m_Player->GetCenterPos().m_iX;
+			float pcy = m_Player->GetCenterPos().m_iY;
+
+			if ((*it)->GetBullet()->IsPointInCircle(pcx, pcy))
+			{
+				m_Player->SetLife();
+				m_Player->Respon();
+			}
+			
+			else
+				break;
+		}
+
+
+	
 }
 
 void GameManager:: Title() 
@@ -237,7 +316,7 @@ void GameManager:: Title()
 	m_Font.Text(m_ClientRect.right*0.4, m_ClientRect.bottom*0.6, str, 0x00ffffff);
 	m_Font.Text(m_ClientRect.right*0.4, m_ClientRect.bottom*0.7, L"CONSTRUCTION", 0x00ffffff);
 
-	if (m_iTitleY == 0)
+	if (m_iScrollY == 0)
 	{
 		if (GetAsyncKeyState(VK_SHIFT) & 0x0001)
 		{
@@ -372,13 +451,12 @@ void GameManager::MapRender()
 	m_Font.Text(m_ClientRect.right*0.9 + 20 , m_ClientRect.bottom*0.7 + 20, str, 0x00000000);
 
 	//맵
-	m_Map->Render(m_backbufferDC);
+	Maptool::GetSingleton()->Render(m_backbufferDC);
 
 
 	wsprintf(str, TEXT("Tank pos x : %d  y : %d"), (int)m_Player->Getpos().m_iX, (int)m_Player->Getpos().m_iY);
 	m_Font.Text(100, 400, str, 0x00000000);
-	wsprintf(str, TEXT("enemy num %d"), testnum);
-	m_Font.Text(95, 380, str, 0x00000000);
+
 
 	SelectObject(m_backbufferDC, oldBrush);
 	DeleteObject(myBrush);
@@ -387,11 +465,16 @@ void GameManager::MapRender()
 
 GameManager::~GameManager()
 {
-	delete m_Map;
 	delete m_Player;
 	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
 	{
 		delete (*it);
 	}
 	m_Enemylist.clear();
+
+	Maptool::GetSingleton()->Clear();
+	Maptool::Release();
+
+	BitMapManager::GetSingleton()->Clear();
+	BitMapManager::Release();
 }

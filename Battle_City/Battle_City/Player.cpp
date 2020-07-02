@@ -8,22 +8,27 @@ Player::Player()
 
 void Player::Init()
 {
-	m_dwLastTime = GetTickCount();
-	m_dwCurTime = GetTickCount();
-	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
+	//m_dwLastTime = GetTickCount();
+	//m_dwCurTime = GetTickCount();
+	//m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
 
 	m_iScore = 0;
 	m_iLife = 3;
 
 	//Tank
-	m_edirection = UP;
-	m_eTankimg = T_PLAYER_UP_0;
-	m_pos.m_iX =  4 * TILESIZEX;
-	m_pos.m_iY = 12 * TILESIZEY;
-	m_eTankType = PLAYER;
-	m_eTState = TANKAPPEAR;
+	Respon();
 
 	Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY + 3,(long)m_pos.m_iX + TILESIZEX - 3  ,(long)m_pos.m_iY + TILESIZEY - 3 };
+}
+
+void Player::Respon()
+{
+	m_edirection = UP;
+	m_eTankimg = T_PLAYER_UP_0;
+	m_pos.m_iX = 4 * TILESIZEX;
+	m_pos.m_iY = 12 * TILESIZEY;
+	m_eTankType = TYPEPLAYER;
+	m_eTState = TANKAPPEAR;
 }
 
 void Player::Update(vector<Tile*> v)
@@ -34,7 +39,7 @@ void Player::Update(vector<Tile*> v)
 
 	if (m_eTState != TANKAPPEAR)
 	{
-		m_bullet->Update(m_edirection,v);
+		m_bullet->Update(v);
 		KeyCheck(v);
 	}
 }
@@ -42,9 +47,6 @@ void Player::Update(vector<Tile*> v)
 
 void Player::KeyCheck(vector<Tile*> v)
 {
-	if (!m_bullet->GetShoot())
-
-	{
 		if (GetKeyState(VK_LEFT) & 0x8000)
 		{
 			m_edirection = LEFT;
@@ -74,8 +76,6 @@ void Player::KeyCheck(vector<Tile*> v)
 		{
 			m_bullet->Create(m_pos, m_edirection);
 		}
-	}
-
 }
 
 void Player::TankImg()

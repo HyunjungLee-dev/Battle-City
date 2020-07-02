@@ -1,13 +1,16 @@
 #pragma once
 #include"Mecro.h"
 #include"BitMapManager.h"
+#include"Maptool.h"
 class Bullet
 {
 private:
 	queue<POS> m_bullet;
 	SIZE ImgSize;
 	DIRECTION m_direction;
-	bool m_bShoot, m_bCollision;
+	TYPE m_eCollType;
+	bool m_bCollision;
+
 	int type;
 
 	float CenterX, CenterY;
@@ -24,11 +27,11 @@ public:
 	void ExsplosionRender(HDC hdc);
 	void Render();
 	void Collision(vector<Tile*> v);
-	bool IsPointInRect(RECT rc);
-	bool IsPointInCircle(POS point);
-
-	bool GetShoot() { return m_bShoot; }
-	void Update(DIRECTION direction, vector<Tile*> v);
+	bool IsPointInRect(RECT rc,int x, int y);
+	bool IsPointInCircle(float cx, float cy);
+	void Update(vector<Tile*> v);
 	void Clear();
+
+	bool CheckEmpty() { return m_bullet.empty(); }
 };
 

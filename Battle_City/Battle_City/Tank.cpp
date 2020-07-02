@@ -5,6 +5,9 @@
 Tank::Tank()
 {
 	m_bullet = new Bullet;
+	m_dwLastTime = GetTickCount();
+	m_dwCurTime = GetTickCount();
+	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
 }
 
 
@@ -30,7 +33,7 @@ void Tank::Render(HDC hdc)
 			}
 			if (RepeatNum == 4)
 			{
-				if (m_eTankType == PLAYER)
+				if (m_eTankType == TYPEPLAYER)
 					m_eTState = TANKSHIELD;
 				else
 					m_eTState = TANKMOVE;
@@ -66,8 +69,8 @@ void Tank::Render(HDC hdc)
 	}
 	else
 	{
-		BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
 		m_bullet->Render();
+		BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
 	}
 
 }
@@ -123,6 +126,7 @@ bool Tank::Collision(RECT rct)
 				}
 			}
 		}
+		Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY + 3,(long)m_pos.m_iX + TILESIZEX - 3  ,(long)m_pos.m_iY + TILESIZEY - 3 };
 		return true;
 	}
 	return false;
@@ -173,16 +177,16 @@ void Tank::Move(vector<Tile*> v)
 		switch (m_edirection)
 		{
 		case UP:
-			m_pos.m_iY -= 100 * m_fDeltaTime;
+			m_pos.m_iY -= 80 * m_fDeltaTime;
 			break;
 		case DOWN:
-			m_pos.m_iY += 100 * m_fDeltaTime;
+			m_pos.m_iY += 80 * m_fDeltaTime;
 			break;
 		case LEFT:
-			m_pos.m_iX -= 100 * m_fDeltaTime;
+			m_pos.m_iX -= 80 * m_fDeltaTime;
 			break;
 		case RIGHT:
-			m_pos.m_iX += 100 * m_fDeltaTime;
+			m_pos.m_iX += 80 * m_fDeltaTime;
 			break;
 		default:
 			break;

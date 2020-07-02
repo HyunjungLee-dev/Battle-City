@@ -8,10 +8,7 @@ Enemy::Enemy()
 
 void Enemy::Init()
 {
-	m_dwLastTime = GetTickCount();
-	m_dwCurTime = GetTickCount();
-	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
-
+	m_iPoint = 100;
 }
 
 
@@ -23,7 +20,8 @@ void Enemy::Update(vector<Tile*> v)
 
 	if (m_eTState != TANKAPPEAR)
 	{
-		m_bullet->Update(m_edirection, v);
+		m_bullet->Create(m_pos, m_edirection);
+		m_bullet->Update(v);
 		TankImg();
 		Move(v);
 		if (!Movable(v, m_edirection))
@@ -56,27 +54,28 @@ void Enemy::Update(vector<Tile*> v)
 
 void Enemy::Changedirection()
 {
-	switch (m_edirection)
-	{
-	case UP:
-		m_edirection = LEFT;
-		m_eTankimg = T_ENUMY_LT_0;
-		break;
-	case DOWN:
-		m_edirection = RIGHT;
-		m_eTankimg = T_ENUMY_RT_0;
-		break;
-	case LEFT:
-		m_edirection = DOWN;
-		m_eTankimg = T_ENUMY_DN_0;
-		break;
-	case RIGHT:
-		m_edirection = UP;
-		m_eTankimg = T_ENUMY_UP_0;
-		break;
-	default:
-		break;
-	}
+
+		switch (m_edirection)
+		{
+		case UP:
+			m_edirection = LEFT;
+			m_eTankimg = T_ENUMY_LT_0;
+			break;
+		case DOWN:
+			m_edirection = RIGHT;
+			m_eTankimg = T_ENUMY_RT_0;
+			break;
+		case LEFT:
+			m_edirection = DOWN;
+			m_eTankimg = T_ENUMY_DN_0;
+			break;
+		case RIGHT:
+			m_edirection = UP;
+			m_eTankimg = T_ENUMY_UP_0;
+			break;
+		default:
+			break;
+		}
 }
 
 void Enemy::TankImg()
@@ -120,7 +119,7 @@ void Enemy::Create()
 	m_eTankimg = T_ENUMY_LT_0;
 	m_pos.m_iX = random * TILESIZEX;
 	m_pos.m_iY =  0;
-	m_eTankType = ENEMY;
+	m_eTankType = TYPEENEMY;
 	m_eTState = TANKAPPEAR;
 
 	Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY + 3,(long)m_pos.m_iX + TILESIZEX - 3  ,(long)m_pos.m_iY + TILESIZEY - 3 };

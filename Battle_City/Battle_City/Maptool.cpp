@@ -1,6 +1,7 @@
 #include "Maptool.h"
 
 
+Maptool* Maptool::_Singleton = NULL;
 
 Maptool::Maptool()
 {
@@ -150,6 +151,53 @@ void Maptool::Clear()
 	m_Map.clear();
 }
 
+void Maptool::Collision(int index, DIRECTION direct)
+{
+	if (m_Map.at(index)->eTileID == MAP_BLOCK)
+	{
+		switch (direct)
+		{
+		case UP:
+			m_Map[index]->eTileID = MAP_BLOCKT;
+			m_Map[index]->Rct.bottom = long(m_Map[index]->fY + TILESIZEY * 0.5);
+			break;
+		case DOWN:
+			m_Map[index]->eTileID = MAP_BLOCKB;
+			m_Map[index]->Rct.top = long(m_Map[index]->fY + TILESIZEY * 0.5);
+			break;
+		case LEFT:
+			m_Map[index]->eTileID = MAP_BLOCKL;
+			m_Map[index]->Rct.right = long(m_Map[index]->fX + TILESIZEX * 0.5);
+			break;
+		case RIGHT:
+			m_Map[index]->eTileID = MAP_BLOCKR;
+			m_Map[index]->Rct.left = long(m_Map[index]->fX + TILESIZEX * 0.5);
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		switch ((MAP)m_Map.at(index)->eTileID)
+		{
+		case MAP_BLOCKT:
+		case MAP_BLOCKL:
+		case MAP_BLOCKB:
+		case MAP_BLOCKR:
+			m_Map[index]->eTileID = MAP_NONE;
+			break;
+		case MAP_EAGLE:
+			m_Map[index]->eTileID = MAP_ENDFALGE;
+			break;
+		case MAP_ENDFALGE:
+			break;
+		default:
+			break;
+		}
+	}
+
+}
 Maptool::~Maptool()
 {
 

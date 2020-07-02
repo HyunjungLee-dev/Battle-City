@@ -1,6 +1,5 @@
 #pragma once
 #include"Bitmap.h"
-#include"Singleton.h"
 
 
 class BitMapManager : public Singleton< BitMapManager>

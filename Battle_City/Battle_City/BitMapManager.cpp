@@ -75,7 +75,10 @@ void BitMapManager::ObjectImgLoad()
 	m_ObjectImglist.at(OBJE_EXPLOSION02)->ImgLoad(BufferDC, L"Res//explosion_02.bmp");
 	m_ObjectImglist.at(OBJE_EXPLOSION03)->ImgLoad(BufferDC, L"Res//explosion_03.bmp");
 	m_ObjectImglist.at(OBJE_EXPLOSION04)->ImgLoad(BufferDC, L"Res//explosion_04.bmp");
-	m_ObjectImglist.at(OBJE_BULLET)->ImgLoad(BufferDC, L"Res//missile_00.bmp");
+	m_ObjectImglist.at(OBJE_BULLETL)->ImgLoad(BufferDC, L"Res//missile_00.bmp");
+	m_ObjectImglist.at(OBJE_BULLETU)->ImgLoad(BufferDC, L"Res//missile_01.bmp");
+	m_ObjectImglist.at(OBJE_BULLETD)->ImgLoad(BufferDC, L"Res//missile_02.bmp");
+	m_ObjectImglist.at(OBJE_BULLETR)->ImgLoad(BufferDC, L"Res//missile_03.bmp");
 	m_ObjectImglist.at(OBJE_PLAYER)->ImgLoad(BufferDC, L"Res//player_icon.bmp");
 	m_ObjectImglist.at(OBJE_SHIELD00)->ImgLoad(BufferDC, L"Res//shield_00.bmp");
 	m_ObjectImglist.at(OBJE_SHIELD01)->ImgLoad(BufferDC, L"Res//shield_01.bmp");

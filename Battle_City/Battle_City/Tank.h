@@ -29,8 +29,16 @@ public:
 	bool Collision(RECT rct);
 
 	POS Getpos() { return m_pos; }
+	Bullet* GetBullet() { return m_bullet; }
 //	int Getindex() { return index; }
 	RECT GetRect() { return Rct; }
+	POS GetCenterPos()
+	{
+		POS pos;
+		pos.m_iX = m_pos.m_iX + TILESIZEX * 0.5;
+		pos.m_iY = m_pos.m_iY + TILESIZEY * 0.5;
+		return pos;
+	}
 	Tank();
 	virtual ~Tank();
 };

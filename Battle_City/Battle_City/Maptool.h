@@ -2,8 +2,7 @@
 #include"Mecro.h"
 #include"BitMapManager.h"
 
-
-class Maptool
+class Maptool : public Singleton< Maptool>
 {
 private:
 	HWND m_hWnd;
@@ -15,10 +14,17 @@ public:
 	void Render(HDC hdc);
 	void Save();
 	void Load(LPCWSTR Flie);
+	void Collision(int index,DIRECTION direct);
 	void Clear();
 
 	vector<Tile*> GetMap() { return m_Map; }
-	//int(*arr(void))[13] { return g_map; }
+	bool FlagCheck()
+	{
+		if (m_Map[162]->eTileID == MAP_ENDFALGE)
+			return true;
+		else
+			return false;
+	}
 	Maptool();
 	~Maptool();
 };
