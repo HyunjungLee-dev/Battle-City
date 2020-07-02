@@ -33,6 +33,8 @@ void GameManager::Init(HWND hWnd)
 	m_iSelect = 1;
 	m_iStage = 1;
 
+	//테스트
+	testnum = 0;
 
 	//스테이지
 	TCHAR str[128];
@@ -54,8 +56,11 @@ void GameManager::Update()
 	}
 	else if (m_eState == GAMEPLAY)
 	{
-		EnemyUpdate();
-		m_Player->Update(m_Map->GetMap());
+		//Enemy
+			EnemyUpdate();
+
+		//Player
+			m_Player->Update(m_Map->GetMap());
 	}
 	else
 	{
@@ -135,6 +140,7 @@ void GameManager::EnemyCreate()//일정 시간이 지나면 생성
 			m_Enemylist.push_back(new Enemy);
 			m_Enemylist.back()->Create();
 			m_dwLastTime = m_dwCurTime;
+			testnum++;
 		}
 	}
 	else
@@ -146,7 +152,9 @@ void GameManager::EnemyCreate()//일정 시간이 지나면 생성
 				m_Enemylist.push_back(new Enemy);
 				m_Enemylist.back()->Create();
 				m_dwLastTime = m_dwCurTime;
+				testnum++;
 			}
+
 		}
 	}
 }
@@ -154,6 +162,7 @@ void GameManager::EnemyCreate()//일정 시간이 지나면 생성
 void GameManager::EnemyUpdate()
 {
 	EnemyCreate();
+	TankCollision();
 	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
 	{
 		(*it)->Update(m_Map->GetMap());
@@ -166,6 +175,31 @@ void GameManager::EnemyRender(HDC hdc)
 	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
 	{
 		(*it)->Render(hdc);
+	}
+}
+
+void GameManager::TankCollision()
+{
+	if (!m_Enemylist.empty())
+	{
+		list<Enemy*>::iterator iter = m_Enemylist.begin();
+
+		while (iter != m_Enemylist.end())
+		{
+			for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
+			{
+				if (iter != it)
+				{
+					if ((*iter)->isTankfornt((*it)->GetRect()))
+					{
+						(*iter)->Changedirection();
+						(*it)-> Changedirection();
+						break;
+					}
+				}
+			}
+			iter++;
+		}
 	}
 }
 
@@ -343,8 +377,8 @@ void GameManager::MapRender()
 
 	wsprintf(str, TEXT("Tank pos x : %d  y : %d"), (int)m_Player->Getpos().m_iX, (int)m_Player->Getpos().m_iY);
 	m_Font.Text(100, 400, str, 0x00000000);
-	//wsprintf(str, TEXT("Tank col index %d"), m_Player->Getindex());
-	//m_Font.Text(95, 380, str, 0x00000000);
+	wsprintf(str, TEXT("enemy num %d"), testnum);
+	m_Font.Text(95, 380, str, 0x00000000);
 
 	SelectObject(m_backbufferDC, oldBrush);
 	DeleteObject(myBrush);

@@ -17,8 +17,6 @@ protected:
 	DWORD	m_dwLastTime;
 	DWORD	m_dwCurTime;
 	float	m_fDeltaTime;
-	int index;
-
 public:
 	virtual void Init() = 0;
 	virtual void TankImg() = 0;
@@ -27,10 +25,11 @@ public:
 	void Render(HDC hdc);
 
 	bool isWallfornt(vector<Tile*> v, int num);
-	void SetNotIntersect(RECT Rect, const RECT Hold);
+	bool isTankfornt(RECT rct);
+	bool Collision(RECT rct);
 
 	POS Getpos() { return m_pos; }
-	int Getindex() { return index; }
+//	int Getindex() { return index; }
 	RECT GetRect() { return Rct; }
 	Tank();
 	virtual ~Tank();

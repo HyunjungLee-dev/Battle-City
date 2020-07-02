@@ -8,7 +8,7 @@ private:
 	int m_iLife;
 public:
 	virtual void Init();
-	 void Update(vector<Tile*> v);
+	void Update(vector<Tile*> v);
 	virtual void TankImg();
 	void KeyCheck(vector<Tile*> v);
 	int GetScore() { return m_iScore; }

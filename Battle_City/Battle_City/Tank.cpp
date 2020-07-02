@@ -72,11 +72,69 @@ void Tank::Render(HDC hdc)
 
 }
 
-void Tank::SetNotIntersect(RECT Rect, const RECT Hold)
+bool Tank::Collision(RECT rct)
 {
-	/*RECT Inter;
+	RECT tmp;
 
-	if()*/
+	if (IntersectRect(&tmp, &rct, &Rct))
+	{
+		int InterW = tmp.right - tmp.left;
+		int InterH = tmp.bottom - tmp.top;
+
+		if (InterW > InterH)
+		{
+			if (tmp.top == rct.top)
+			{
+				if (m_pos.m_iY - InterH > 0 && m_eTState != TANKAPPEAR)
+				{
+					m_pos.m_iY -= InterH;
+					Rct.top -= InterH;
+					Rct.bottom -= InterH;
+				}
+			}
+			else if (tmp.bottom == rct.bottom)
+			{
+				if (m_pos.m_iY - InterH < TILESIZEY * TILESIZEY &&  m_eTState != TANKAPPEAR)
+				{
+					m_pos.m_iY += InterH;
+					Rct.top += InterH;
+					Rct.bottom += InterH;
+				}
+			}
+		}
+		else
+		{
+			if (tmp.left == rct.left)
+			{
+				if (m_pos.m_iY - InterW > 0 &&  m_eTState != TANKAPPEAR)
+				{
+					m_pos.m_iX -= InterW;
+					Rct.left -= InterW;
+					Rct.right -= InterW;
+				}
+			}
+			else if (tmp.right == rct.right)
+			{
+				if (m_pos.m_iX - InterW < TILESIZEX * TILESIZEX && m_eTState != TANKAPPEAR)
+				{
+					m_pos.m_iX += InterW;
+					Rct.left += InterW;
+					Rct.right += InterW;
+				}
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+bool Tank::isTankfornt(RECT rct)
+{
+	if (Collision(rct))
+	{
+		return true;
+	}
+	return false;
 }
 
 
@@ -94,55 +152,22 @@ bool Tank::isWallfornt(vector<Tile*> v, int num)
 	y[3] = y[4] = y[0] + TILESIZEY * 0.5;
 	y[5] = y[6] = y[7] = y[0] + TILESIZEY  * 0.7;
 	
-		index = (int)(y[num] / TILESIZEY) * TILEX + (int)(x[num] / TILESIZEX);
-		if (v[index]->eTileID != (int)MAP_NONE)
-		{
-			if (IntersectRect(&tmp, &v[index]->Rct, &Rct))
-			{
-				int InterW = tmp.right - tmp.left;
-				int InterH = tmp.bottom - tmp.top;
-
-				if (InterW > InterH)
-				{
-					if(tmp.top == v[index]->Rct.top)
-					{
-						m_pos.m_iY -= InterH;
-						Rct.top -= InterH;
-						Rct.bottom -= InterH;
-					}
-					else if (tmp.bottom == v[index]->Rct.bottom)
-					{
-						m_pos.m_iY += InterH;
-						Rct.top += InterH;
-						Rct.bottom += InterH;
-					}
-				}
-				else
-				{
-					if (tmp.left == v[index]->Rct.left)
-					{
-						m_pos.m_iX -= InterW;
-						Rct.left -= InterW;
-						Rct.right -= InterW;
-					}
-					else if (tmp.right == v[index]->Rct.right)
-					{
-						m_pos.m_iX += InterW;
-						Rct.left += InterW;
-						Rct.right += InterW;
-					}
-				}
-			
-				return false;
-			}
-		}
+	int	index = (int)(y[num] / TILESIZEY) * TILEX + (int)(x[num] / TILESIZEX);
+	if (index <0 || index >= TILEX * TILEY)
+		return false;
+	else if (v[index]->eTileID != (int)MAP_NONE)
+	{
+		if (Collision(v[index]->Rct))
+			return true;
+	}
 		
 
-	return true;
+	return false;
 }
 
 void Tank::Move(vector<Tile*> v)
 {
+
 	if (Movable(v, m_edirection))
 	{
 		switch (m_edirection)
@@ -175,14 +200,14 @@ bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
 		case UP:
 			if (m_pos.m_iY <= 0)
 				return false;
-			if (!isWallfornt(v, 1)|| !isWallfornt(v, 0) || !isWallfornt(v, 2))
+			else if (isWallfornt(v, 1) || isWallfornt(v, 0) || isWallfornt(v, 2))
 				return false;
 			return true;
 			break;
 		case DOWN:
 			if (m_pos.m_iY >= TILESIZEY * 12)
 				return false;
-			if (!isWallfornt(v, 6)|| !isWallfornt(v, 5) || !isWallfornt(v, 7))
+			else if (isWallfornt(v, 6)|| isWallfornt(v, 5) || isWallfornt(v, 7))
 				return false;
 			else
 				return true;
@@ -190,7 +215,7 @@ bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
 		case LEFT:
 			if (m_pos.m_iX < 0)
 				return false;
-			if (!isWallfornt(v, 3) || !isWallfornt(v, 0) || !isWallfornt(v, 5))
+			else if (isWallfornt(v, 3) || isWallfornt(v, 0) || isWallfornt(v, 5))
 				return false;
 			else
 				return true;
@@ -198,7 +223,7 @@ bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
 		case RIGHT:
 			if (m_pos.m_iX > TILESIZEX * 12)
 				return false;
-			if (!isWallfornt(v, 4) || !isWallfornt(v, 2) || !isWallfornt(v, 7))
+			else if (isWallfornt(v, 4) || isWallfornt(v, 2) || isWallfornt(v, 7))
 				return false;
 			else
 				return true;

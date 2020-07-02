@@ -26,7 +26,7 @@ void Enemy::Update(vector<Tile*> v)
 		m_bullet->Update(m_edirection, v);
 		TankImg();
 		Move(v);
-		if (!Movable(v, m_edirection))// 막혔을때 방향 바꾸는 함수 필요
+		if (!Movable(v, m_edirection))
 		{
 			int random = rand() % 4;
 			switch ((DIRECTION)random)
@@ -51,6 +51,31 @@ void Enemy::Update(vector<Tile*> v)
 				break;
 			}
 		}
+	}
+}
+
+void Enemy::Changedirection()
+{
+	switch (m_edirection)
+	{
+	case UP:
+		m_edirection = LEFT;
+		m_eTankimg = T_ENUMY_LT_0;
+		break;
+	case DOWN:
+		m_edirection = RIGHT;
+		m_eTankimg = T_ENUMY_RT_0;
+		break;
+	case LEFT:
+		m_edirection = DOWN;
+		m_eTankimg = T_ENUMY_DN_0;
+		break;
+	case RIGHT:
+		m_edirection = UP;
+		m_eTankimg = T_ENUMY_UP_0;
+		break;
+	default:
+		break;
 	}
 }
 

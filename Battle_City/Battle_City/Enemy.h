@@ -9,6 +9,7 @@ public:
 	virtual void TankImg();
 	void Create();
 	void Update(vector<Tile*> v);
+	void Changedirection();
 	Enemy();
 	virtual ~Enemy();
 };
