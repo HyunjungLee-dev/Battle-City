@@ -17,38 +17,72 @@ void GameManager::Init(HWND hWnd)
 	m_backbufferDC = BitMapManager::GetSingleton()->GetBufferDC();
 
 	m_eState = GAMEWAIT;
-
+	m_iScore = 0;
+	m_iHiScore = 20000;
 
 	Maptool::GetSingleton()->Init(hWnd);
 	m_Font.Init();
 
-	m_Player = new Player; // 탱크팩토리?
 
-	m_Player->Init();
-	m_Player->SetLife();
 
-	m_iHiScore = 20000;
+
+	ReInit();
+
+}
+
+void GameManager::ReInit()
+{
 	m_iScrollY = 450;
-	// 다시 타이틀로 돌아올때 초기화 필요
+	m_bGameOver = false;
+	
 	m_iSelect = 1;
 	m_iStage = 1;
 	m_iAllEnemyNum = 20;
 	m_iCreateEnemyNum = m_iAllEnemyNum;
 	m_ikillEnemyNum = 0;
 
+	m_Player = new Player;
+	m_Player->Init();
+
+
+	m_Enemylist.push_back(new Enemy);
+	m_Enemylist.back()->Init();
+	m_iCreateEnemyNum--;
 
 	//스테이지
 	TCHAR str[128];
 	wsprintf(str, TEXT("STAGE0%d"), m_iStage);
 	Maptool::GetSingleton()->Load(str);
-}
 
+}
 
 
 void GameManager::Update()
 {
-	if (m_eState == GAMEWAIT )
+	m_dwCurTime = GetTickCount();
+	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
+	m_dwLastTime = m_dwCurTime;
+
+	if (m_eState == GAMEWAIT)
+	{
 		Title();
+	}
+	else if (m_eState == GANERESTART)
+	{
+		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+		Clear();
+		ReInit();
+		m_eState = GAMEWAIT;
+	}
+	else if (m_eState == GAMCONSTRUCTION)
+	{
+		if (Maptool::GetSingleton()->MapConstruction())
+		{
+			Maptool::GetSingleton()->Load(TEXT("Construction"));
+
+		}
+
+	}
 	else if (m_eState == GAMESTAGE || m_eState == GAMESTART)
 	{
 		if (m_eState == GAMESTART)
@@ -59,18 +93,19 @@ void GameManager::Update()
 	}
 	else if (m_eState == GAMEPLAY)
 	{
+		EnemyUpdate();
+		m_Player->Update(Maptool::GetSingleton()->GetMap());
+		TankbulletCollision();
+
 		if (m_Player->GetLife() < 0 || Maptool::GetSingleton()->FlagCheck())
 		{
-			m_eState = GAMEOVER;
-			m_iScrollY = 450;
-		}
-		else
-		{
-			EnemyUpdate();
-			m_Player->Update(Maptool::GetSingleton()->GetMap());
-			TankbulletCollision();
+			m_bGameOver = true;
+			if (m_iScrollY == 0)
+				m_iScrollY = 450;
 		}
 	}
+	else if (m_eState == GAMEEND || m_eState == GAMEOVER)
+		GameEnd();
  	Render();
 }
 
@@ -78,8 +113,8 @@ void GameManager::Render()
 {
  	HDC hdc = GetDC(m_hWnd);
 
-	m_dwCurTime = GetTickCount();
-	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
+	static float m_fMainTime = 0.0f;
+	static float m_fOverTime = 0.0f;
 
 
 	//가변비율
@@ -91,15 +126,17 @@ void GameManager::Render()
 
 	if (m_eState == GAMEWAIT)
 	{
+		m_fMainTime += m_fDeltaTime;
+
 		if (m_iScrollY != 0)
 		{
-			if (m_fDeltaTime > 0.04f)
+			if (m_fMainTime > 0.04f)
 			{
 				if (m_iScrollY <= 0)
 					m_iScrollY = 0;
 				else
 					m_iScrollY -= 10;
-				m_dwLastTime = m_dwCurTime;
+				m_fMainTime = 0.0f;
 			}
 		}
 		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, m_iScrollY, 1);
@@ -108,44 +145,151 @@ void GameManager::Render()
 	{
 		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
 		MapRender();
-		//Rectangle(m_backbufferDC, MapStartX + m_Player.GetRect().left, MapStartY + m_Player.GetRect().top, MapStartX + m_Player.GetRect().right, MapStartY + m_Player.GetRect().bottom);
 		m_Player->Render(m_backbufferDC);
 		EnemyRender(m_backbufferDC);
-		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, 0, 1);
-	}
-	else if (m_eState == GAMEOVER)
-	{
-		m_dwCurTime = GetTickCount();
-		m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
-
-		if (m_iScrollY != m_ClientRect.bottom*0.5)
+		if (m_bGameOver)
 		{
-			MapRender();
-			EnemyRender(m_backbufferDC);
-
-			if (m_fDeltaTime > 0.04f)
+			m_fOverTime += m_fDeltaTime;
+			if (m_iScrollY != m_ClientRect.bottom*0.5)
 			{
-				if (m_iScrollY <= m_ClientRect.bottom*0.5)
-					m_iScrollY = m_ClientRect.bottom*0.5;
-				else
-					m_iScrollY -= 10;
-				m_dwLastTime = m_dwCurTime;
+				if (m_fOverTime > 0.04f)
+				{
+					if (m_iScrollY <= m_ClientRect.bottom*0.5)
+						m_iScrollY = m_ClientRect.bottom*0.5;
+					else
+						m_iScrollY -= 10;
+					m_fOverTime = 0.0f;
+				}
+			}
+			else
+			{
+				if (m_fOverTime > 3.0f)
+				{
+					m_fOverTime = 0.0f;
+					m_eState = GAMEEND;
+				}
 			}
 			m_Font.Text(m_ClientRect.right*0.4, m_iScrollY, L"GAME", RGB(255, 187, 0));
 			m_Font.Text(m_ClientRect.right*0.4, m_iScrollY + 12, L"OVER", RGB(255, 187, 0));
 		}
-		else
-			GameOver();
 		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, 0, 1);
+	}
+	else if (m_eState == GAMCONSTRUCTION)
+	{
+		TCHAR str[128];
+
+		HBRUSH myBrush = (HBRUSH)CreateSolidBrush(RGB(178, 178, 178));
+		HBRUSH oldBrush = (HBRUSH)SelectObject(m_backbufferDC, myBrush);
+
+		//배경
+		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, PATCOPY);
+		Maptool::GetSingleton()->Render(m_backbufferDC);
+
+
+		//wsprintf(str, TEXT("Tank pos x : %d  y : %d"), (int)m_Player->Getpos().m_iX, (int)m_Player->Getpos().m_iY);
+		//m_Font.Text(100, 400, str, 0x00000000);
+
+		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc, 0, 0, 1);
+		SelectObject(m_backbufferDC, oldBrush);
+		DeleteObject(myBrush);
 	}
 	else
 		BitMapManager::GetSingleton()->GetBackBuffer().Draw(hdc,0,0,1);
 	ReleaseDC(m_hWnd, hdc);
 }
 
-void GameManager::GameOver()
+void GameManager::GameEnd()
 {
+	static float m_fNumTime = 0.0f;
+
+	m_fNumTime += m_fDeltaTime;
+
 	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+	if (m_eState == GAMEOVER)
+	{
+		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+		BitMapManager::GetSingleton()->GetImg(OBJE_GAMEOVER)->Draw(m_backbufferDC, m_ClientRect.right*0.2, m_ClientRect.bottom*0.2, 2, 2);
+		if (m_fNumTime > 2.0f)
+		{
+			if (m_iScore > m_iHiScore)
+			{
+				m_iHiScore = m_iScore;
+			}
+			m_eState = GANERESTART;
+			m_fNumTime = 0.0f;
+		}
+	}
+	else
+		ScoreCheck(&m_fNumTime);
+	
+
+}
+
+void GameManager::ScoreCheck(float *Time)
+{
+	TCHAR str[128];
+	static int TankNum = 0;
+	static int TankScore = 0;
+	int TotalNum = 0;
+
+	
+
+	wsprintf(str, TEXT("%8d"), m_iHiScore);
+	m_Font.Text(m_ClientRect.right*0.3, m_ClientRect.bottom*0.2, TEXT("HI-SCORE"), RGB(255, 94, 0));
+	m_Font.Text(m_ClientRect.right*0.53, m_ClientRect.bottom*0.2, str, RGB(255, 187, 0));
+
+	wsprintf(str, TEXT("STAGE  %d"), m_iStage);
+	m_Font.Text(m_ClientRect.right*0.43, m_ClientRect.bottom*0.3, str, 0x00FFFFFF);
+
+	m_Font.Text(m_ClientRect.right*0.2, m_ClientRect.bottom*0.4, TEXT("I-PLAYER"), RGB(255, 94, 0));
+	wsprintf(str, TEXT(" %8d"), m_iScore);
+	m_Font.Text(m_ClientRect.right*0.175, m_ClientRect.bottom*0.45, str, RGB(255, 187, 0));
+
+	m_Font.Text(m_ClientRect.right*0.31, m_ClientRect.bottom*0.6, TEXT("PTS"), 0x00FFFFFF);
+
+	BitMapManager::GetSingleton()->GetImg(OBJE_SCORE)->Draw(m_backbufferDC, m_ClientRect.right*0.4, m_ClientRect.bottom*0.57, 0.8, 0.8);
+
+	m_Font.Text(m_ClientRect.right*0.26, m_ClientRect.bottom*0.68, TEXT("TOTAL"), 0x00FFFFFF);
+
+	if (TankNum != m_ikillEnemyNum)
+	{
+		if (*Time > 0.2f)
+		{
+			TankScore += 100;
+			TankNum += 1;
+
+			*Time = 0.0f;
+		}
+	}
+	else
+	{
+		m_iScore = TankScore;
+		TotalNum = TankNum;
+		wsprintf(str, TEXT("%2d"), TotalNum);
+		m_Font.Text(m_ClientRect.right*0.4, m_ClientRect.bottom*0.68, str, 0x00FFFFFF);
+		if (*Time > 2.0f)
+		{
+			if (m_bGameOver)
+			{
+
+				m_eState = GAMEOVER;
+				TankNum = 0;
+				TankScore = 0;
+				*Time = 0.0f;
+			}
+			else
+				m_eState = GANERESTART;
+		}
+
+
+	}
+
+	wsprintf(str, TEXT("%8d"), TankScore);
+	m_Font.Text(m_ClientRect.right*0.1, m_ClientRect.bottom*0.6, str, 0x00FFFFFF);
+
+	wsprintf(str, TEXT("%2d"), TankNum);
+	m_Font.Text(m_ClientRect.right*0.4, m_ClientRect.bottom*0.6, str, 0x00FFFFFF);
+
 
 }
 
@@ -170,29 +314,23 @@ void GameManager::EnemyIconRender(HDC hdc)
 
 void GameManager::EnemyCreate()//일정 시간이 지나면 생성
 {
-	m_dwCurTime = GetTickCount();
-	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
+	static float m_fCreateTime = 0.0f;
 
-	if (m_Enemylist.empty())
-	{
-			m_Enemylist.push_back(new Enemy);
-			m_Enemylist.back()->Create();
-			m_iCreateEnemyNum--;
-	}
-	else
-	{
+	
 		if ( m_iCreateEnemyNum > 0)
 		{
-			if (m_fDeltaTime > 8.0f)
+			m_fCreateTime += m_fDeltaTime;
+
+			if (m_fCreateTime > 8.0f)
 			{
 				m_Enemylist.push_back(new Enemy);
-				m_Enemylist.back()->Create();
+				m_Enemylist.back()->Init();
 				m_iCreateEnemyNum--;
-				m_dwLastTime = m_dwCurTime;
+				m_fCreateTime = 0.0f;
 			}
 
 		}
-	}
+	
 }
 
 void GameManager::EnemyUpdate()
@@ -204,13 +342,48 @@ void GameManager::EnemyUpdate()
 		(*it)->Update(Maptool::GetSingleton()->GetMap());
 	}
 
+
+}
+
+void GameManager::EnemyPointRender()
+{
+	TCHAR str[128];
+	static float TankPointTime = 0.0f;
+
+	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
+	{
+
+		if ((*it)->GetState() == TANKEXSPLOSION )
+		{
+			TankPointTime += m_fDeltaTime;
+
+			if (TankPointTime > 2.0f)
+			{
+				m_ikillEnemyNum++;
+				delete (*it);
+				m_Enemylist.erase(it);
+				TankPointTime = 0.0f;
+				if (m_ikillEnemyNum >= m_iAllEnemyNum) // END가 아니라 다음 스테이지로
+					m_eState = GAMEEND;
+				break;
+			}
+			else if(TankPointTime > 0.8f && TankPointTime < 2.0f)
+			{
+				wsprintf(str, TEXT("%d"), (*it)->GetPoint());
+				m_Font.Text((*it)->Getpos().m_iX + 5 , (*it)->Getpos().m_iY + 45 , str, 0x00ffffff);
+
+			}
+		}
+	}
 }
 
 void GameManager::EnemyRender(HDC hdc)
 {
+	EnemyPointRender();
 	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
 	{
-		(*it)->Render(hdc);
+		if((*it)->GetState() != TANKEXSPLOSION)
+			(*it)->Render(hdc);
 	}
 }
 
@@ -223,19 +396,22 @@ void GameManager::TankCollision()
 		{
 			for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
 			{
-				if (iter != it)
+				if ((*iter)->GetState() != TANKEXSPLOSION)
 				{
-					if ((*iter)->isTankfornt((*it)->GetRect()))
+					if (iter != it)
+					{
+						if ((*iter)->isTankfornt((*it)->GetRect()))
+						{
+							(*iter)->Changedirection();
+							(*it)->Changedirection();
+							break;
+						}
+					}
+					if ((*iter)->isTankfornt(m_Player->GetRect()))
 					{
 						(*iter)->Changedirection();
-						(*it)->Changedirection();
 						break;
 					}
-				}
-				if ((*iter)->isTankfornt(m_Player->GetRect()))
-				{
-					(*iter)->Changedirection();
-					break;
 				}
 			}
 			iter++;
@@ -246,8 +422,6 @@ void GameManager::TankCollision()
 void GameManager::TankbulletCollision()
 {
 
-	//TCHAR str[128];
-
 		for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
 		{
 			float cx = (*it)->GetCenterPos().m_iX;
@@ -255,27 +429,25 @@ void GameManager::TankbulletCollision()
 
 			if (m_Player->GetBullet()->IsPointInCircle(cx, cy))
 			{
-				//wsprintf(str, TEXT("%d"), (*it)->GetPoint());
-				delete (*it);
-				m_Enemylist.erase(it);
-
- 				//m_Font.Text(cx, cy, str, 0x00000000);
-	
-				m_ikillEnemyNum++;
+				(*it)->SetTankState(TANKEXSPLOSION);
 				break;
 			}
 
-			float pcx = m_Player->GetCenterPos().m_iX;
+			/*float pcx = m_Player->GetCenterPos().m_iX;
 			float pcy = m_Player->GetCenterPos().m_iY;
 
 			if ((*it)->GetBullet()->IsPointInCircle(pcx, pcy))
 			{
 				m_Player->SetLife();
-				m_Player->Respon();
-			}
+				if (m_Player->GetLife() >= 0)
+					m_Player->Respon();
+				else
+				{
+					m_Player->SetTankState(TANKNONE);
+					break;
+				}
+			}*/
 			
-			else
-				break;
 		}
 
 
@@ -285,16 +457,17 @@ void GameManager::TankbulletCollision()
 void GameManager:: Title() 
 {
 	static TANK temp = T_PLAYER_RT_0;
-	m_dwCurTime = GetTickCount();
-	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
+	static float m_fMoveTime = 0.0f;
 
-	if (m_fDeltaTime > 0.05f)
+	m_fMoveTime += m_fDeltaTime;
+
+	if (m_fMoveTime > 0.05f)
 	{
 		if (temp == T_PLAYER_RT_0)
 			temp = T_PLAYER_RT_1;
 		else
 			temp = T_PLAYER_RT_0;
-		m_dwLastTime = m_dwCurTime;
+		m_fMoveTime = 0.0f;
 	}
 
 	TCHAR str[128];
@@ -302,10 +475,10 @@ void GameManager:: Title()
 
 	BitMapManager::GetSingleton()->GetImg(OBJE_TITLE)->Draw(m_backbufferDC, m_ClientRect.right*0.11, m_ClientRect.bottom*0.2, 0.7, 0.7);
 
-	if(m_Player->GetScore() == 0)
-		wsprintf(str, TEXT("I-%8d0"), m_Player->GetScore());
+	if(m_iScore == 0)
+		wsprintf(str, TEXT("I-%8d0"), m_iScore);
 	else
-		wsprintf(str, TEXT("I-%8d"), m_Player->GetScore());
+		wsprintf(str, TEXT("I-%8d"), m_iScore);
 	m_Font.Text(m_ClientRect.right*0.1, m_ClientRect.bottom*0.1, str, 0x00ffffff);
 	wsprintf(str, TEXT("HI-%8d"), m_iHiScore);
 	m_Font.Text(m_ClientRect.right*0.4, m_ClientRect.bottom*0.1, str, 0x00ffffff);
@@ -331,7 +504,11 @@ void GameManager:: Title()
 			if (m_iSelect == 1)
 				m_eState = GAMESTAGE;
 			else
+			{
 				m_eState = GAMCONSTRUCTION;
+				Maptool::GetSingleton()->Clear();
+				Maptool::GetSingleton()->SetMap();
+			}
 			PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
 			return;
 		}
@@ -346,14 +523,12 @@ void GameManager:: Title()
 
 void GameManager::Stage()
 {
-	m_dwCurTime = GetTickCount();
-	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
-
-	static float NextTime = 0;
+	static float NextTime = 0.0f;
 
 	static int UpY = 0;
 	static int DownY = m_ClientRect.bottom;
 	static bool bClose = true;
+	static float m_fStageTime = 0.0f;
 
 	RECT UpRct, DownRct;
 
@@ -380,7 +555,8 @@ void GameManager::Stage()
 
 	if (bClose)
 	{
-		if (m_fDeltaTime > 0.04f)
+		m_fStageTime += m_fDeltaTime;
+		if (m_fStageTime > 0.04f)
 		{
 			if (DownY < m_ClientRect.bottom*0.5 && UpY > m_ClientRect.bottom*0.5)
 			{
@@ -393,14 +569,14 @@ void GameManager::Stage()
 				UpY += 10;
 				DownY -= 10;
 			}
-			m_dwLastTime = m_dwCurTime;
+			m_fStageTime = 0.0f;
 		}
 	}
 	else
 	{
 		m_eState = GAMESTART;
-
-		if (m_fDeltaTime > 0.04f)
+		m_fStageTime += m_fDeltaTime;
+		if (m_fStageTime > 0.04f)
 		{
 
 			if (DownY > m_ClientRect.bottom && UpY < 0)
@@ -410,13 +586,14 @@ void GameManager::Stage()
 				bClose = true;
 				NextTime = 0;
 				m_eState = GAMEPLAY;
+				m_Player->SetLife();
 			}
 			else
 			{
 				UpY -= 10;
 				DownY += 10;
 			}
-			m_dwLastTime = m_dwCurTime;
+			m_fStageTime = 0.0f;
 		}
 	}
 
@@ -463,15 +640,25 @@ void GameManager::MapRender()
 }
 
 
-GameManager::~GameManager()
+
+void GameManager::Clear()
 {
-	delete m_Player;
+	if (m_Player != NULL)
+	{
+		delete m_Player;
+		m_Player = NULL;
+	}
+
 	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
 	{
 		delete (*it);
 	}
 	m_Enemylist.clear();
+}
 
+GameManager::~GameManager()
+{
+	Clear();
 	Maptool::GetSingleton()->Clear();
 	Maptool::Release();
 

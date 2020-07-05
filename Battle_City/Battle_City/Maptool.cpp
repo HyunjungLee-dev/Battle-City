@@ -11,6 +11,8 @@ void Maptool::Init(HWND hwnd)
 {
 	m_hWnd = hwnd;
 	SetMap();
+	m_Cursor = { 0,0 };
+	m_bConstruction = false;
 }
 
 void Maptool::SetMap()
@@ -33,7 +35,7 @@ void Maptool::SetMap()
 }
 
 
-void Maptool::Create(POINT pt)
+void Maptool::Init(POINT pt)
 {
 	int index = (pt.y / TILESIZEY) * TILEX + (pt.x / TILESIZEX);
 
@@ -75,37 +77,40 @@ void Maptool::Render(HDC hdc)
 	{
 		if (m_Map[i]->eTileID == MAP_NONE)
 		{
-			//Rectangle(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, STARTX + m_Map[i]->fX + TILESIZEX, STARTY + m_Map[i]->fY + TILESIZEY);
+			Rectangle(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, STARTX + m_Map[i]->fX + TILESIZEX, STARTY + m_Map[i]->fY + TILESIZEY);
 
 		}
 		else
 			BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileID)->Draw(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, 1, 1);
 		//Rectangle(hdc, STARTX + m_Map[i]->Rct.left, STARTY + m_Map[i]->Rct.top, STARTX + m_Map[i]->Rct.right, STARTY + m_Map[i]->Rct.bottom);
 	}
+
+	if(m_bConstruction)
+		BitMapManager::GetSingleton()->GetImg(T_PLAYER_UP_0)->Draw(hdc, STARTX + m_Cursor.m_iX, STARTY + m_Cursor.m_iY, 1, 1);
 }
 
 void Maptool::Save()
 {
-	OPENFILENAME OFN;
-	char str[300];
-	char lpstrFile[MAX_PATH] = "";
-	char lpstrPath[MAX_PATH] = "";
+	//OPENFILENAME OFN;
+	//char str[300];
+	//char lpstrFile[MAX_PATH] = "";
+	//char lpstrPath[MAX_PATH] = "";
 
-	memset(&OFN, 0, sizeof(OPENFILENAME));
-	OFN.lStructSize = sizeof(OPENFILENAME);
-	OFN.hwndOwner = m_hWnd;
-	OFN.lpstrFilter = L"Every File(*.*)\0*.*\0Text File\0*.txt;*.doc\0";
-	OFN.lpstrFile = (LPWSTR)lpstrFile;
-	OFN.nMaxFile = 256;
-	GetCurrentDirectory(MAX_PATH, (LPWSTR)lpstrPath);
-	OFN.lpstrInitialDir = (LPWSTR)lpstrPath;
-	if (GetSaveFileName(&OFN) == 0)
-	{
-		DWORD err = CommDlgExtendedError();
-		return;
-	}
+	//memset(&OFN, 0, sizeof(OPENFILENAME));
+	//OFN.lStructSize = sizeof(OPENFILENAME);
+	//OFN.hwndOwner = m_hWnd;
+	//OFN.lpstrFilter = L"Every File(*.*)\0*.*\0Text File\0*.txt;*.doc\0";
+	//OFN.lpstrFile = (LPWSTR)lpstrFile;
+	//OFN.nMaxFile = 256;
+	//GetCurrentDirectory(MAX_PATH, (LPWSTR)lpstrPath);
+	//OFN.lpstrInitialDir = (LPWSTR)lpstrPath;
+	//if (GetSaveFileName(&OFN) == 0)
+	//{
+	//	DWORD err = CommDlgExtendedError();
+	//	return;
+	//}
 
-	HANDLE hFile = CreateFile(OFN.lpstrFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	HANDLE hFile = CreateFile(L"Construction", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	for (int i = 0; i < m_Map.size(); i++)
 	{
 
@@ -198,6 +203,52 @@ void Maptool::Collision(int index, DIRECTION direct)
 	}
 
 }
+
+bool Maptool::MapConstruction()
+{
+	m_bConstruction = true;
+
+	
+		if (GetAsyncKeyState(VK_LEFT) & 0x0001)
+		{
+			if (m_Cursor.m_iX <= 0)
+				return false;
+			m_Cursor.m_iX -= TILESIZEX;
+		}
+		else if (GetAsyncKeyState(VK_UP) & 0x0001)
+		{
+			if (m_Cursor.m_iY <= 0)
+				return false;
+			m_Cursor.m_iY -= TILESIZEY;
+		}
+		else if (GetAsyncKeyState(VK_RIGHT) & 0x0001)
+		{
+			if (m_Cursor.m_iX >= TILESIZEX * 12)
+				return false;
+			m_Cursor.m_iX += TILESIZEX;
+		}
+		else if (GetAsyncKeyState(VK_DOWN) & 0x0001)
+		{
+			if (m_Cursor.m_iY >= TILESIZEY * 12)
+				return false;
+			m_Cursor.m_iY += TILESIZEY;
+		}
+		else if (GetAsyncKeyState('Z') & 0x8000)
+		{
+
+		}
+		else if (GetKeyState(VK_RETURN) & 0x8000)
+		{
+			Save();
+			return true;
+		}
+	
+
+
+	return false;
+}
+
+
 Maptool::~Maptool()
 {
 

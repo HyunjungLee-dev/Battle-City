@@ -4,7 +4,6 @@
 class Player : public Tank
 {
 private:
-	int m_iScore;
 	int m_iLife;
 public:
 	virtual void Init();
@@ -13,7 +12,6 @@ public:
 	void KeyCheck(vector<Tile*> v);
 	void Respon();
 
-	int GetScore() { return m_iScore; }
 	int GetLife() { return m_iLife; }
 	void SetLife() { m_iLife--; }
 	Player();

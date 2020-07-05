@@ -6,21 +6,15 @@ Enemy::Enemy()
 {
 }
 
-void Enemy::Init()
-{
-	m_iPoint = 100;
-}
-
-
 void Enemy::Update(vector<Tile*> v)
 {
 	m_dwCurTime = GetTickCount();
 	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
 	m_dwLastTime = m_dwCurTime;
 
-	if (m_eTState != TANKAPPEAR)
+	if (m_eTState != TANKAPPEAR && m_eTState != TANKEXSPLOSION)
 	{
-		m_bullet->Create(m_pos, m_edirection);
+		m_bullet->Init(m_pos, m_edirection);
 		m_bullet->Update(v);
 		TankImg();
 		Move(v);
@@ -111,7 +105,9 @@ void Enemy::TankImg()
 	}
 }
 
-void Enemy::Create()
+
+
+void Enemy::Init()
 {
 	int random = rand() % 12;
 
@@ -121,6 +117,7 @@ void Enemy::Create()
 	m_pos.m_iY =  0;
 	m_eTankType = TYPEENEMY;
 	m_eTState = TANKAPPEAR;
+	m_iPoint = 100;
 
 	Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY + 3,(long)m_pos.m_iX + TILESIZEX - 3  ,(long)m_pos.m_iY + TILESIZEY - 3 };
 

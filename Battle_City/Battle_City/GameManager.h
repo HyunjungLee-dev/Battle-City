@@ -11,6 +11,7 @@ private:
 	RECT m_ClientRect;
 
 	GAMESTATE m_eState;
+	bool m_bGameOver;
 
 	DWORD	m_dwLastTime;
 	DWORD	m_dwCurTime;
@@ -28,16 +29,21 @@ private:
 	int m_iScrollY;
 	int m_iSelect;
 	int m_iHiScore;
+	int m_iScore;
 	int m_iStage;
 public:
 	void Init(HWND hWnd);
+	void ReInit();
 	void Update();
 	void Render();
 
+
+	//EnemyManagerClass
 	void EnemyIconRender(HDC hdc);
 	void EnemyCreate();
 	void EnemyRender(HDC hdc);
 	void EnemyUpdate();
+	void EnemyPointRender();
 
 	void TankCollision();
 	void TankbulletCollision();
@@ -45,8 +51,14 @@ public:
 
 	void Title();
 	void Stage();
-	void GameOver();
+	void GameEnd();
 	void MapRender();
+
+
+	void Clear();
+
+	void  ScoreCheck(float *Time);
+
 
 	GameManager();
 	~GameManager();

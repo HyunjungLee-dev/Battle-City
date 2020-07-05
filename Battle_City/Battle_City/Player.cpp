@@ -12,7 +12,6 @@ void Player::Init()
 	//m_dwCurTime = GetTickCount();
 	//m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
 
-	m_iScore = 0;
 	m_iLife = 3;
 
 	//Tank
@@ -72,9 +71,9 @@ void Player::KeyCheck(vector<Tile*> v)
 			Move(v);
 		}
 
-		if (GetAsyncKeyState(VK_SPACE) & 0x0001)
+		if (GetAsyncKeyState(0x5A) & 0x0001)
 		{
-			m_bullet->Create(m_pos, m_edirection);
+			m_bullet->Init(m_pos, m_edirection);
 		}
 }
 

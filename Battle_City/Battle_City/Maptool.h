@@ -7,13 +7,16 @@ class Maptool : public Singleton< Maptool>
 private:
 	HWND m_hWnd;
 	vector<Tile*> m_Map;
+	POS m_Cursor;
+	bool m_bConstruction;
 public:
 	void Init(HWND hwnd);
 	void SetMap();
-	void Create(POINT pt);
+	void Init(POINT pt);
 	void Render(HDC hdc);
 	void Save();
 	void Load(LPCWSTR Flie);
+	bool MapConstruction();
 	void Collision(int index,DIRECTION direct);
 	void Clear();
 
@@ -25,6 +28,7 @@ public:
 		else
 			return false;
 	}
+	bool GetConstruction() { return m_bConstruction; }
 	Maptool();
 	~Maptool();
 };

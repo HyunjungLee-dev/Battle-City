@@ -28,10 +28,14 @@ public:
 	bool isTankfornt(RECT rct);
 	bool Collision(RECT rct);
 
-	POS Getpos() { return m_pos; }
+
+	void SetTankState(TANKSTATE state) { m_eTState = state; }
+	
+	
+	TANKSTATE GetState() { return m_eTState; }
 	Bullet* GetBullet() { return m_bullet; }
-//	int Getindex() { return index; }
 	RECT GetRect() { return Rct; }
+	POS Getpos() { return m_pos; }
 	POS GetCenterPos()
 	{
 		POS pos;

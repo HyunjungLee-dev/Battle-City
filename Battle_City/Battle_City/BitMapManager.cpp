@@ -88,6 +88,8 @@ void BitMapManager::ObjectImgLoad()
 	m_ObjectImglist.at(OBJE_APPEAR1)->ImgLoad(BufferDC, L"Res//appear1.bmp");
 	m_ObjectImglist.at(OBJE_APPEAR2)->ImgLoad(BufferDC, L"Res//appear2.bmp");
 	m_ObjectImglist.at(OBJE_APPEAR3)->ImgLoad(BufferDC, L"Res//appear3.bmp");
+	m_ObjectImglist.at(OBJE_SCORE)->ImgLoad(BufferDC, L"Res//score.bmp");
+	m_ObjectImglist.at(OBJE_GAMEOVER)->ImgLoad(BufferDC, L"Res//gameover.bmp");
 }
 
 

@@ -12,7 +12,7 @@ Bullet::Bullet()
 	m_bCollision = false;
 }
 
-void Bullet::Create(POS pos,DIRECTION direction)
+void Bullet::Init(POS pos,DIRECTION direction)
 {
 	POS bulletPos;
 
@@ -131,7 +131,7 @@ void  Bullet::Collision(vector<Tile*> v)
 					Maptool::GetSingleton()->Collision(i, m_direction);
 					if (v[i]->eTileID == MAP_ENDFALGE)
 					{
-						m_eCollType = TYPETANK;;
+						m_eCollType = TYPETANK;
 					}
 					m_bCollision = true;
 					return;
@@ -147,6 +147,7 @@ bool Bullet::IsPointInCircle(float cx, float cy) // ÅÊÅ© Ãæµ¹
 	ImgSize = BitMapManager::GetSingleton()->GetImg((OBJECT)type)->GetSize();
 	int x, y;
 	float cr;
+
 	cr = TILESIZEX * 0.5;
 
 	if (!m_bullet.empty())
@@ -190,8 +191,6 @@ void Bullet::ExsplosionRender(HDC hdc)
 	int x = STARTX + m_bullet.front().m_iX;
 	int y = STARTY + m_bullet.front().m_iY;
 
-	SIZE size = BitMapManager::GetSingleton()->GetImg((OBJECT)type)->GetSize();
-
 	static float Time = 0.0f;
 	static int tmptype = type;
 	static int RepeatNum = 0;
@@ -221,6 +220,8 @@ void Bullet::ExsplosionRender(HDC hdc)
 		}
 		Time = 0.0f;
 	}
+
+	SIZE size = BitMapManager::GetSingleton()->GetImg((OBJECT)type)->GetSize();
 
 	if (m_direction == LEFT)
 	{

@@ -69,8 +69,11 @@ void Tank::Render(HDC hdc)
 	}
 	else
 	{
-		m_bullet->Render();
-		BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
+		if (m_eTState != TANKNONE || m_eTState != TANKEXSPLOSION)
+		{
+			m_bullet->Render();
+			BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
+		}
 	}
 
 }

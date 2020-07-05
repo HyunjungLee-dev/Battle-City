@@ -11,6 +11,7 @@ private:
 	TYPE m_eCollType;
 	bool m_bCollision;
 
+
 	int type;
 
 	float CenterX, CenterY;
@@ -22,7 +23,7 @@ public:
 	Bullet();
 	~Bullet();
 
-	void Create(POS pos, DIRECTION direction);
+	void Init(POS pos, DIRECTION direction);
 	void Shoot(vector<Tile*> v);
 	void ExsplosionRender(HDC hdc);
 	void Render();
@@ -31,6 +32,7 @@ public:
 	bool IsPointInCircle(float cx, float cy);
 	void Update(vector<Tile*> v);
 	void Clear();
+
 
 	bool CheckEmpty() { return m_bullet.empty(); }
 };
