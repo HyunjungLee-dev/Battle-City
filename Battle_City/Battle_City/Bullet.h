@@ -8,7 +8,7 @@ private:
 	queue<POS> m_bullet;
 	SIZE ImgSize;
 	DIRECTION m_direction;
-	TYPE m_eCollType;
+	//TYPE m_eCollType;
 	bool m_bCollision;
 
 

@@ -3,6 +3,7 @@
 #include"Font.h"
 #include"Player.h"
 #include"Enemy.h"
+#include"Item.h"
 class GameManager
 {
 private:
@@ -14,15 +15,15 @@ private:
 
 	GAMESTATE m_eState;
 	bool m_bGameOver;
-
+	ITEM m_eNowItem;
 
 	DWORD	m_dwLastTime;
 	DWORD	m_dwCurTime;
 	float	m_fDeltaTime;
 
-	Font m_Font;
 	Player* m_Player;
 	list<Enemy*> m_Enemylist;
+	list<Item*> m_Itemlist;
 
 	int m_iAllEnemyNum;
 	int m_ikillEnemyNum;
@@ -41,27 +42,36 @@ public:
 	void Render();
 
 
-	//EnemyManagerClass
+	//Enemy
 	void EnemyIconRender(HDC hdc);
 	void EnemyCreate();
 	void EnemyRender(HDC hdc);
 	void EnemyUpdate();
-	void EnemyPointRender();
+
 
 	void TankCollision();
 	void TankbulletCollision();
+
 	bool CreatePosCheck(POS pos);
+	void ExsplosionAfter();
+	
+	//Item
+	void CreateItem();
+	void ItemlistDraw();
+	void ItemUpdate();	
+	void EnemyListBomb();
 
 
 	void Title();
 	void Stage();
 	void GameEnd();
 	void MapRender();
-
+	void ScoreCheck(float *Time);
 
 	void Clear();
 
-	void  ScoreCheck(float *Time);
+
+
 
 
 	GameManager();

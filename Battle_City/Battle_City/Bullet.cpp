@@ -113,7 +113,6 @@ void  Bullet::Collision(vector<Tile*> v)
 	if (y <= 0 || y >= TILESIZEY * 13 - ImgSize.cy || x <= 0 || x >= TILESIZEX * 13 )
 	{
 		type = OBJE_EXPLOSION00;
-		m_eCollType = TYPEWALL;
 		m_bCollision = true;
 		return;
 	}
@@ -125,13 +124,9 @@ void  Bullet::Collision(vector<Tile*> v)
 			{
 				if (IsPointInRect(v[i]->Rct,x,y))
 				{
-					m_eCollType = TYPEWALL;
 					type = OBJE_EXPLOSION00;
-					Maptool::GetSingleton()->Collision(i, m_direction);
-					if (v[i]->eTileID == MAP_ENDFALGE)
-					{
-						m_eCollType = TYPETANK;
-					}
+					if (!Maptool::GetSingleton()->Collision(i, m_direction))
+						Clear();
 					m_bCollision = true;
 					return;
 				}
@@ -164,9 +159,8 @@ bool Bullet::IsPointInCircle(float cx, float cy) // ÅÊÅ© Ãæµ¹
 			return false;
 		else
 		{
-			type = OBJE_EXPLOSION00;
-			m_eCollType = TYPETANK;
 			m_bCollision = true;
+			Clear();
 			return true;
 		}
 	}
@@ -192,43 +186,17 @@ void Bullet::ExsplosionRender(HDC hdc)
 
 	static float Time = 0.0f;
 	static int tmptype = type;
-	//static int RepeatNum = 0;
-	static bool check = false;
 	static int time = 0;
+
 	Time += m_fDeltaTime;
 
 	if (Time > 0.15f)
 	{
-		if (m_eCollType == TYPEWALL)
+		tmptype++;
+		if (tmptype > OBJE_EXPLOSION01)
 		{
-			tmptype++;
-			if (tmptype = OBJE_EXPLOSION01)
-			{
-				tmptype = OBJE_EXPLOSION00;
-				Clear();
-				//tmptype = type;
-			}
-		}
-		else if (m_eCollType == TYPETANK)
-		{
-			if (check)
-			{
-				tmptype--;
-				if (tmptype <= OBJE_EXPLOSION00)
-				{
-					Clear();
-					check = false;
-					//tmptype = type;
-				}
-			}
-			else
-			{
-				tmptype++;
-				if (tmptype >= OBJE_EXPLOSION04)
-				{
-					check = true;
-				}
-			}
+			tmptype = OBJE_EXPLOSION00;
+			Clear();
 		}
 		Time = 0.0f;
 	}
@@ -252,12 +220,6 @@ void Bullet::ExsplosionRender(HDC hdc)
 		BitMapManager::GetSingleton()->GetImg((OBJECT)tmptype)->Draw(hdc, x - size.cx * 0.5, y - size.cy* 0.5, 1, 1);
 	}
 
-	/*if (RepeatNum == 1)
-	{
-		Clear();
-		RepeatNum = 0;
-	}*/
-
 }
 
 void Bullet::Render()
@@ -273,8 +235,6 @@ void Bullet::Render()
 			ExsplosionRender(hdc);
 		}
 	}
-
-
 }
 
 void Bullet::Update(vector<Tile*> v)

@@ -1,4 +1,4 @@
-#include "Maptool.h"
+﻿#include "Maptool.h"
 
 
 Maptool* Maptool::_Singleton = NULL;
@@ -9,10 +9,15 @@ Maptool::Maptool()
 
 void Maptool::Init()
 {
+	m_dwLastTime = GetTickCount();
+	m_dwCurTime = GetTickCount();
+
 	SetMap();
 	m_Cursor = { 0,0 };
 	m_bConstruction = false;
+	m_bItemFlag = false;
 	m_iID = 0;
+	m_iCollisionIndex = -1;
 }
 
 void Maptool::SetMap()
@@ -45,6 +50,26 @@ void Maptool::SetMap()
 				m_Map.back()->Rct.right = long(m_Map.back()->fX + TILESIZEX * 0.5);
 			}
 		}
+	}
+}
+
+void Maptool::ItemTileChange()
+{
+	if (m_bItemFlag)
+	{
+		m_Map[161]->eTileID = MAP_GBLOCKR;
+		m_Map[148]->eTileID = MAP_GBLOCKR;
+		m_Map[149]->eTileID = MAP_GBLOCK;
+		m_Map[150]->eTileID = MAP_GBLOCKL;
+		m_Map[163]->eTileID = MAP_GBLOCKL;
+	}
+	else
+	{
+		m_Map[161]->eTileID = MAP_BLOCKR;
+		m_Map[148]->eTileID = MAP_BLOCKR;
+		m_Map[149]->eTileID = MAP_BLOCK;
+		m_Map[150]->eTileID = MAP_BLOCKL;
+		m_Map[163]->eTileID = MAP_BLOCKL;
 	}
 }
 
@@ -90,17 +115,22 @@ void Maptool::Create()
 
 void Maptool::CursorRender(HDC hdc)
 {
+
+	m_dwCurTime = GetTickCount();
+	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
+
+
 	if (m_bConstruction)
-	{
-		/*if (m_fDeltaTime > 0.2f)
+	{	
+		if (m_fDeltaTime > 0.2f)
 		{
-			PatBlt(hdc, STARTX + m_Cursor.m_iX, STARTY + m_Cursor.m_iY, STARTX + m_Cursor.m_iX + TILESIZEX, STARTY + m_Cursor.m_iY + TILESIZEY, BLACKNESS);
+			BitMapManager::GetSingleton()->GetImg(T_PLAYER_UP_0)->Draw(hdc, STARTX + m_Cursor.m_iX, STARTY + m_Cursor.m_iY, 1, 1);
 		}
 		if (m_fDeltaTime > 0.4f)
-		{*/
-			BitMapManager::GetSingleton()->GetImg(T_PLAYER_UP_0)->Draw(hdc, STARTX + m_Cursor.m_iX, STARTY + m_Cursor.m_iY, 1, 1);
-			//m_dwLastTime = m_dwCurTime;
-		//}
+		{
+			m_dwLastTime = m_dwCurTime;
+		}
+
 	}
 }
 
@@ -118,7 +148,7 @@ void Maptool::layerRender(HDC hdc)
 
 void Maptool::Render(HDC hdc)
 {
-	static float m_fCursorRenderTime = 0.0f;
+
 
 	RECT ret = { STARTX ,STARTY, TILESIZEX * TILEX , TILESIZEY * TILEY };
 	PatBlt(hdc, ret.left, ret.top, ret.right, ret.bottom, BLACKNESS);
@@ -131,7 +161,14 @@ void Maptool::Render(HDC hdc)
 
 		}
 		else
-			BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileID)->Draw(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, 1, 1);
+		{
+			if (m_iCollisionIndex != -1)
+			{
+				Effect(hdc);
+			}
+		
+				BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileID)->Draw(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, 1, 1);
+		}
 		//Rectangle(hdc, STARTX + m_Map[i]->Rct.left, STARTY + m_Map[i]->Rct.top, STARTX + m_Map[i]->Rct.right, STARTY + m_Map[i]->Rct.bottom);
 	}
 }
@@ -182,7 +219,7 @@ void Maptool::Clear()
 	m_Map.clear();
 }
 
-void Maptool::Collision(int index, DIRECTION direct)
+bool Maptool::Collision(int index, DIRECTION direct)
 {
 	if (m_Map.at(index)->eTileID == MAP_BLOCK)
 	{
@@ -207,6 +244,7 @@ void Maptool::Collision(int index, DIRECTION direct)
 		default:
 			break;
 		}
+		return true;
 	}
 	else
 	{
@@ -219,7 +257,8 @@ void Maptool::Collision(int index, DIRECTION direct)
 			m_Map[index]->eTileID = MAP_NONE;
 			break;
 		case MAP_EAGLE:
-			m_Map[index]->eTileID = MAP_ENDFALGE;
+			m_iCollisionIndex = index;
+			return false;
 			break;
 		case MAP_ENDFALGE:
 			break;
@@ -270,10 +309,47 @@ bool Maptool::MapConstruction()
 			m_bConstruction = false;
 			return true;
 		}
-	
-
-
 	return false;
+}
+
+void Maptool::Effect(HDC hdc)
+{
+	m_dwCurTime = GetTickCount();
+	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
+
+	static bool check = false;
+	static float TextTime = 0.0f;
+	static int tmptype = OBJE_EXPLOSION00;
+
+	if (m_fDeltaTime > 0.1f)
+	{
+		if (check)
+		{
+			tmptype--;
+			if (tmptype < OBJE_EXPLOSION00)
+			{
+				tmptype = OBJE_EXPLOSION00;
+				check = false;
+				m_Map[m_iCollisionIndex]->eTileID = MAP_ENDFALGE;
+				m_iCollisionIndex = -1;
+			}
+		}
+		else
+		{
+			tmptype++;
+			if (tmptype >= OBJE_EXPLOSION04)
+			{
+
+				check = true;
+			}
+		}
+		m_dwLastTime = m_dwCurTime;
+	}
+	if (m_iCollisionIndex > -1)
+	{
+		SIZE size = BitMapManager::GetSingleton()->GetImg((OBJECT)tmptype)->GetSize();
+		BitMapManager::GetSingleton()->GetImg((OBJECT)tmptype)->Draw(hdc, m_Map[m_iCollisionIndex]->fX - size.cx * 0.5 + STARTX, m_Map[m_iCollisionIndex]->fY - size.cy* 0.5 + STARTY, 1, 1);
+	}
 }
 
 

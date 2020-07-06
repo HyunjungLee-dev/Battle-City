@@ -1,6 +1,6 @@
 #include "Font.h"
 
-
+Font* Font::_Singleton = NULL;
 
 Font::Font()
 {

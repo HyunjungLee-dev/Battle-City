@@ -15,6 +15,7 @@ void BitMapManager::Init(HWND hWnd)
 	MapImgLoad();
 	TankImgLoad();
 	ObjectImgLoad();
+	ItemImgLoad();
 	ReleaseDC(hWnd, hdc);
 }
 
@@ -69,6 +70,7 @@ void BitMapManager::ObjectImgLoad()
 	{
 		m_ObjectImglist.push_back(new Bitmap);
 	}
+
 	m_ObjectImglist.at(OBJE_ENEMY)->ImgLoad(BufferDC, L"Res//enemy_icon.bmp");
 	m_ObjectImglist.at(OBJE_EXPLOSION00)->ImgLoad(BufferDC, L"Res//explosion_00.bmp");
 	m_ObjectImglist.at(OBJE_EXPLOSION01)->ImgLoad(BufferDC, L"Res//explosion_01.bmp");
@@ -90,6 +92,23 @@ void BitMapManager::ObjectImgLoad()
 	m_ObjectImglist.at(OBJE_APPEAR3)->ImgLoad(BufferDC, L"Res//appear3.bmp");
 	m_ObjectImglist.at(OBJE_SCORE)->ImgLoad(BufferDC, L"Res//score.bmp");
 	m_ObjectImglist.at(OBJE_GAMEOVER)->ImgLoad(BufferDC, L"Res//gameover.bmp");
+}
+
+void BitMapManager::ItemImgLoad()
+{
+	CHAR str[128];
+
+	for (int i = ITEM_START; i < ITEM_END; i++)
+	{
+		m_ItemImglist.push_back(new Bitmap);
+	}
+
+	m_ItemImglist.at(ITEM_BOMB)->ImgLoad(BufferDC, L"Res//bomb.bmp");
+	m_ItemImglist.at(ITEM_CLOCK)->ImgLoad(BufferDC, L"Res//clock.bmp");
+	m_ItemImglist.at(ITEM_HELMET)->ImgLoad(BufferDC, L"Res//helmet.bmp");
+	m_ItemImglist.at(ITEM_SHOVEL)->ImgLoad(BufferDC, L"Res//shovel.bmp");
+	m_ItemImglist.at(ITEM_TANK)->ImgLoad(BufferDC, L"Res//tank.bmp");
+
 }
 
 
@@ -119,6 +138,14 @@ void BitMapManager::Clear()
 
 	}
 	m_TankImglist.clear();
+
+	for (vector<Bitmap*>::iterator it = m_ItemImglist.begin(); it != m_ItemImglist.end(); it++)
+	{
+		(*it)->Release();
+		delete (*it);
+
+	}
+	m_ItemImglist.clear();
 }
 
 BitMapManager::~BitMapManager()

@@ -11,6 +11,7 @@ void Player::Init()
 {
 	m_iLife = 3;
 	Respon();
+	m_bullet = new Bullet;
 
 	Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY + 3,(long)m_pos.m_iX + TILESIZEX - 3  ,(long)m_pos.m_iY + TILESIZEY - 3 };
 }
@@ -28,7 +29,7 @@ void Player::Respon()
 void Player::Update(vector<Tile*> v, float dtime)
 {
 
-	if (m_eTState != TANKAPPEAR && m_eTState != TANKNONE)
+	if (m_eTState != TANKAPPEAR && m_eTState != TANKNONE && m_eTState != TANKEXSPLOSION)
 	{
 		m_bullet->Update(v);
 		KeyCheck(v, dtime);

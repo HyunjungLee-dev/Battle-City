@@ -4,12 +4,13 @@
 class Enemy : public Tank
 {
 private:
-	int m_iPoint;
-
+	bool m_bItemFlag;
 public:
 	virtual void TankImg();
 	virtual void Init();
 
+	bool GetItemFlage() { return m_bItemFlag; }
+	void SetItemFlag(bool b) { m_bItemFlag = b; }
 	void SetPos();
 	void SetTankType(TYPE type) { m_eTankType = type; };
 	void Update(vector<Tile*> v, float dtime);

@@ -1,6 +1,6 @@
 #pragma once
 #include"Bullet.h"
-
+#include"Font.h"
 
 class Tank 
 {
@@ -11,6 +11,7 @@ protected:
 	TYPE m_eTankType;
 	TANK m_eTankimg;
 	TANKSTATE m_eTState;
+	int m_iPoint;
 
 	Bullet* m_bullet;
 public:
@@ -28,6 +29,7 @@ public:
 	void SetTankState(TANKSTATE state) { m_eTState = state; }
 	
 
+	TYPE GetType() { return m_eTankType; }
 	TANKSTATE GetState() { return m_eTState; }
 	Bullet* GetBullet() { return m_bullet; }
 	RECT GetRect() { return Rct; }

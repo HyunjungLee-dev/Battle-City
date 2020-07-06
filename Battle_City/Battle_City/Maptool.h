@@ -9,6 +9,13 @@ private:
 	POS m_Cursor;
 	bool m_bConstruction;
 	int m_iID;
+	int m_iCollisionIndex;
+	bool m_bItemFlag;
+
+	DWORD	m_dwLastTime;
+	DWORD	m_dwCurTime;
+	float	m_fDeltaTime;
+
 public:
 	void Init();
 	void SetMap();
@@ -22,9 +29,13 @@ public:
 	void Save();
 	void Load(LPCWSTR Flie);
 	bool MapConstruction();
-	void Collision(int index,DIRECTION direct);
+	bool Collision(int index,DIRECTION direct);
+	void Effect(HDC hdc);
 	void Clear();
+	void ItemTileChange();
 
+	bool GetItemFlag() { return m_bItemFlag; }
+	void SetItemFlag(bool b) { m_bItemFlag = b; }
 	vector<Tile*> GetMap() { return m_Map; }
 	bool FlagCheck()
 	{

@@ -4,12 +4,13 @@
 
 Tank::Tank()
 {
-	m_bullet = new Bullet;
 }
 
 
 void Tank::Render(HDC hdc, float dTime)
 {
+	TCHAR str[128];
+
 	static int appeartype = OBJE_APPEAR0;
 	static int Shieldtype = OBJE_SHIELD00;
 	static float Time = 0.0f;
@@ -67,9 +68,65 @@ void Tank::Render(HDC hdc, float dTime)
 		}
 		m_bullet->Render();
 	}
+	else if (m_eTState == TANKEXSPLOSION)
+	{
+		static bool check = false;
+		static float TextTime = 0.0f;
+		static int tmptype = OBJE_EXPLOSION00;
+
+		Time += dTime;
+
+		if (Time > 0.1f)
+		{
+			if (check)
+			{
+				tmptype--;
+				if (tmptype < OBJE_EXPLOSION00)
+				{
+					tmptype = OBJE_EXPLOSION00;
+					if (m_eTankType == TYPEENEMY || m_eTankType == TYPEITEM_ENEMY)
+					{
+						TextTime += Time;
+						if (TextTime > 8.0f)
+						{
+							check = false;
+							m_eTState = TANKNONE;
+							TextTime = 0.0f;
+							return;
+						}
+						wsprintf(str, TEXT("%d"), m_iPoint);
+						Font::GetSingleton()->Text(m_pos.m_iX + STARTX, m_pos.m_iY + STARTY, str, 0x00ffffff);
+						return;
+					}
+					else
+					{
+						check = false;
+						m_eTState = TANKNONE;
+					}
+				}
+			}
+			else
+			{
+				tmptype++;
+				if (tmptype >= OBJE_EXPLOSION04)
+				{
+
+					check = true;
+				}
+			}
+			Time = 0.0f;
+		}
+
+		if (TextTime == 0.0f)
+		{
+			SIZE size = BitMapManager::GetSingleton()->GetImg((OBJECT)tmptype)->GetSize();
+			BitMapManager::GetSingleton()->GetImg((OBJECT)tmptype)->Draw(hdc, GetCenterPos().m_iX - size.cx * 0.5 + STARTX, GetCenterPos().m_iY - size.cy* 0.5 + STARTY, 1, 1);
+		}
+	
+	}
 	else
 	{
-		if (m_eTState != TANKNONE || m_eTState != TANKEXSPLOSION)
+		if (m_eTState != TANKNONE )
 		{
 			m_bullet->Render();
 			BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);

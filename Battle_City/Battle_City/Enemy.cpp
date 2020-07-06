@@ -11,33 +11,36 @@ void Enemy::Update(vector<Tile*> v,float dtime)
 
 	if (m_eTState != TANKAPPEAR && m_eTState != TANKEXSPLOSION)
 	{
-		m_bullet->Init(m_pos, m_edirection);
 		m_bullet->Update(v);
-		TankImg();
-		Move(v, dtime);
-		if (!Movable(v, m_edirection, dtime))
+		if (!m_bItemFlag)
 		{
-			int random = rand() % 4;
-			switch ((DIRECTION)random)
+		m_bullet->Init(m_pos, m_edirection);
+		TankImg();
+			Move(v, dtime);
+			if (!Movable(v, m_edirection, dtime))
 			{
-			case UP:
-				m_edirection = LEFT;
-				m_eTankimg = T_ENUMY_LT_0;
-				break;
-			case DOWN:
-				m_edirection = RIGHT;
-				m_eTankimg = T_ENUMY_RT_0;
-				break;
-			case LEFT:
-				m_edirection = DOWN;
-				m_eTankimg = T_ENUMY_DN_0;
-				break;
-			case RIGHT:
-				m_edirection = UP;
-				m_eTankimg = T_ENUMY_UP_0;
-				break;
-			default:
-				break;
+				int random = rand() % 4;
+				switch ((DIRECTION)random)
+				{
+				case UP:
+					m_edirection = LEFT;
+					m_eTankimg = T_ENUMY_LT_0;
+					break;
+				case DOWN:
+					m_edirection = RIGHT;
+					m_eTankimg = T_ENUMY_RT_0;
+					break;
+				case LEFT:
+					m_edirection = DOWN;
+					m_eTankimg = T_ENUMY_DN_0;
+					break;
+				case RIGHT:
+					m_edirection = UP;
+					m_eTankimg = T_ENUMY_UP_0;
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}
@@ -136,6 +139,8 @@ void Enemy::TankImg()
 
 void Enemy::Init()
 {
+	m_bItemFlag = false;
+	m_bullet = new Bullet;
 	m_edirection = LEFT;
 	m_eTankimg = T_ENUMY_LT_0;
 	SetPos();

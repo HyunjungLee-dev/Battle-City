@@ -1,6 +1,6 @@
 #pragma once
 #include"BitMapManager.h"
-class Font
+class Font : public Singleton< Font>
 {
 private:
 	HDC m_Fonthdc;
