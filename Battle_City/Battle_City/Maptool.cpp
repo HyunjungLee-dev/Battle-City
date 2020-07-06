@@ -303,12 +303,15 @@ bool Maptool::MapConstruction()
 			Create();
 
 		}
-		else if (GetAsyncKeyState(VK_RETURN) & 0x0001)
+		 if (GetAsyncKeyState(VK_RETURN) & 0x0001)
 		{
-			Save();
-			m_bConstruction = false;
-			return true;
+			 Save();
+			 m_bConstruction = false;
+
+			 return true;
 		}
+
+		
 	return false;
 }
 

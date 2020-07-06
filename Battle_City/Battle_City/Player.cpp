@@ -9,11 +9,8 @@ Player::Player()
 
 void Player::Init()
 {
-	m_iLife = 3;
+	m_iLife = 2;
 	Respon();
-	m_bullet = new Bullet;
-
-	Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY + 3,(long)m_pos.m_iX + TILESIZEX - 3  ,(long)m_pos.m_iY + TILESIZEY - 3 };
 }
 
 void Player::Respon()
@@ -24,6 +21,9 @@ void Player::Respon()
 	m_pos.m_iY = 12 * TILESIZEY;
 	m_eTankType = TYPEPLAYER;
 	m_eTState = TANKAPPEAR;
+	m_bullet = new Bullet;
+
+	Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY + 3,(long)m_pos.m_iX + TILESIZEX - 3  ,(long)m_pos.m_iY + TILESIZEY - 3 };
 }
 
 void Player::Update(vector<Tile*> v, float dtime)

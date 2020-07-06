@@ -71,7 +71,7 @@ public:
 	void Clear();
 
 
-
+	void SetStage(int stage);
 
 
 	GameManager();

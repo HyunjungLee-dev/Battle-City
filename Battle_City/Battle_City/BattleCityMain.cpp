@@ -1,6 +1,8 @@
 #include"Maptool.h"
 #include"GameManager.h"
+#include"resource.h"
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK StageDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 HINSTANCE g_hInst;
 LPCTSTR lpszClass = TEXT("Battle City");
 
@@ -21,7 +23,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 	WndClass.hInstance = hInstance;
 	WndClass.lpfnWndProc = WndProc;
 	WndClass.lpszClassName = lpszClass;
-	WndClass.lpszMenuName = NULL;
+	WndClass.lpszMenuName = MAKEINTRESOURCE(IDR_MENU1);
 	WndClass.style = CS_HREDRAW | CS_VREDRAW;
 	RegisterClass(&WndClass);
 
@@ -30,7 +32,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 
 	hWnd = CreateWindow(lpszClass, lpszClass, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rt.right - rt.left, rt.bottom - rt.top, NULL, (HMENU)NULL, hInstance, NULL);
 	ShowWindow(hWnd, nCmdShow);
-	ShowWindow(hWnd, nCmdShow);
+
 
 	//Init
 	g_game.Init(hWnd);
@@ -50,6 +52,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 		}
 
 	}
+	g_game.~GameManager();
 	//Release
 	return (int)Message.wParam;
 }
@@ -64,46 +67,45 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 	switch (iMessage)
 	{
-	case WM_CREATE:
-		//CreateWindow(L"button", L"Save", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 100, 400, 100, 30, hWnd, (HMENU)100, g_hInst, NULL);
-		//CreateWindow(L"button", L"Load", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 200, 400, 100, 30, hWnd, (HMENU)101, g_hInst, NULL);
-		//CreateWindow(L"button", L"LoadJson", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300, 400, 100, 30, hWnd, (HMENU)102, g_hInst, NULL);
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_STAGE:
+			DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, StageDlgProc);
+			break;
+		case ID_EXIT:
+			PostQuitMessage(0);
+		}
 		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-	case WM_COMMAND:
-	{
-		switch (LOWORD(wParam))
-		{
-		case 100: //SAVE
-		{
-			//g_game.GetMapTool()->Save();
-		}
-		break;
-		case 101://load
-		{
-			//g_game.GetMapTool()->Load();
-		}
-		break;
-		}
-		return 0;
 	}
-	case WM_LBUTTONDOWN:
-	{
-		/*POINT pt;
-		pt.x = LOWORD(lParam);
-		pt.y = HIWORD(lParam);
-
-		g_game.GetMapTool()->Create(pt);
-		break;*/
-	}
-	return 0;
-	case WM_RBUTTONDOWN:
-	{
-	}
-	return 0;
-	}
-
 	return(DefWindowProc(hWnd, iMessage, wParam, lParam));
+}
+
+
+INT_PTR CALLBACK StageDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	static int Editnum;
+
+	Editnum = GetDlgItemInt(hDlg, IDC_EDIT, NULL, NULL);
+
+	switch (uMsg)
+	{
+	case WM_COMMAND:
+		switch (wParam)
+		{
+			case IDOK:
+				if (Editnum > 3 || Editnum < 1)
+					return (INT_PTR)TRUE;
+				g_game.SetStage(Editnum);
+				EndDialog(hDlg, 0);
+				return (INT_PTR)TRUE;
+			case IDCANCEL:
+				EndDialog(hDlg, 0);
+				return (INT_PTR)TRUE;
+		}
+	}
+	return(INT_PTR)FALSE;
 }

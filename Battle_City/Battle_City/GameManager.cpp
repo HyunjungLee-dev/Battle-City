@@ -41,8 +41,14 @@ void GameManager::ReInit()
 	m_iCreateEnemyNum = m_iAllEnemyNum;
 	m_ikillEnemyNum = 0;
 
-	m_Player = new Player;
-	m_Player->Init();
+	if (m_eState != GAMENEXT)
+	{
+		m_Player = new Player;
+		m_Player->Init();
+	}
+	else
+		m_Player->Respon();
+;
 
 
 	TCHAR str[128];
@@ -64,7 +70,7 @@ void GameManager::Update()
 	}
 	else if (m_eState == GAMERESTART)
 	{
-		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom + 50, BLACKNESS);
 		Clear();
 		ReInit();
 		m_eState = GAMEWAIT;
@@ -147,7 +153,7 @@ void GameManager::Render()
 	{
 
 
-		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom + 50, BLACKNESS);
 		MapRender();
 		m_Player->Render(m_backbufferDC, m_fDeltaTime);
 		EnemyRender(m_backbufferDC);
@@ -192,7 +198,7 @@ void GameManager::Render()
 		HBRUSH myBrush = (HBRUSH)CreateSolidBrush(RGB(178, 178, 178));
 		HBRUSH oldBrush = (HBRUSH)SelectObject(m_backbufferDC, myBrush);
 
-		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, PATCOPY);
+		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom+50, PATCOPY);
 		Maptool::GetSingleton()->Render(m_backbufferDC);
 		Maptool::GetSingleton()->CursorRender(m_backbufferDC);
 
@@ -214,10 +220,10 @@ void GameManager::GameEnd()
 
 	m_fNumTime += m_fDeltaTime;
 
-	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom + 50, BLACKNESS);
 	if (m_eState == GAMEOVER)
 	{
-		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom+50, BLACKNESS);
 		BitMapManager::GetSingleton()->GetImg(OBJE_GAMEOVER)->Draw(m_backbufferDC, m_ClientRect.right*0.2, m_ClientRect.bottom*0.2, 2, 2);
 		if (m_fNumTime > 2.0f)
 		{
@@ -484,8 +490,8 @@ void GameManager::TankbulletCollision()
 
 void GameManager::CreateItem()
 {
-//	ITEM random = ITEM (rand() % ITEM_TANK + 1);
-	ITEM random = ITEM_TANK;
+	ITEM random = ITEM (rand() % ITEM_TANK + 1);
+
 
 	switch (random)
 	{
@@ -659,6 +665,7 @@ void GameManager:: Title()
 {
 	static TANK temp = T_PLAYER_RT_0;
 	static float m_fMoveTime = 0.0f;
+	static bool key = false;
 
 	m_fMoveTime += m_fDeltaTime;
 
@@ -672,7 +679,7 @@ void GameManager:: Title()
 	}
 
 	TCHAR str[128];
-	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom+50, BLACKNESS);
 
 	BitMapManager::GetSingleton()->GetImg(OBJE_TITLE)->Draw(m_backbufferDC, m_ClientRect.right*0.11, m_ClientRect.bottom*0.2, 0.7, 0.7);
 
@@ -705,6 +712,13 @@ void GameManager:: Title()
 
 		if (GetAsyncKeyState(VK_RETURN) & 0x0001)
 		{
+			key = true;
+		}
+		else
+			key = false;
+
+		if (key)
+		{
 			if (m_iSelect == 1)
 			{
 				m_eState = GAMESTAGE;
@@ -716,7 +730,8 @@ void GameManager:: Title()
 				Maptool::GetSingleton()->Clear();
 				Maptool::GetSingleton()->SetMap();
 			}
-			PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, BLACKNESS);
+			PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom + 50, BLACKNESS);
+			key = false;
 			return;
 		}
 
@@ -740,14 +755,14 @@ void GameManager::Stage()
 	static float NextTime = 0.0f;
 
 	static int UpY = 0;
-	static int DownY = m_ClientRect.bottom;
+	static int DownY = m_ClientRect.bottom + 50;
 	static bool bClose = true;
 	static float m_fStageTime = 0.0f;
 
 	RECT UpRct, DownRct;
 
 	UpRct = { m_ClientRect.left, m_ClientRect.top,m_ClientRect.right, UpY};
-	DownRct = { m_ClientRect.left, DownY,m_ClientRect.right,  m_ClientRect.bottom };
+	DownRct = { m_ClientRect.left, DownY,m_ClientRect.right,  m_ClientRect.bottom + 50 };
 
 	HBRUSH myBrush = (HBRUSH)CreateSolidBrush(RGB(178, 178, 178));
 	HBRUSH oldBrush = (HBRUSH)SelectObject(m_backbufferDC, myBrush);
@@ -772,11 +787,11 @@ void GameManager::Stage()
 		m_fStageTime += m_fDeltaTime;
 		if (m_fStageTime > 0.04f)
 		{
-			if (DownY < m_ClientRect.bottom*0.5 && UpY > m_ClientRect.bottom*0.5)
+			if (DownY < (m_ClientRect.bottom + 50)*0.5 && UpY >(m_ClientRect.bottom + 50)*0.5)
 			{
 				NextTime += m_fDeltaTime;
-				DownY = m_ClientRect.bottom*0.5;
-				UpY = m_ClientRect.bottom*0.5;
+				DownY = (m_ClientRect.bottom + 50)*0.5;
+				UpY = (m_ClientRect.bottom + 50)*0.5;
 			}
 			else
 			{
@@ -793,14 +808,13 @@ void GameManager::Stage()
 		if (m_fStageTime > 0.04f)
 		{
 
-			if (DownY > m_ClientRect.bottom && UpY < 0)
+			if (DownY > m_ClientRect.bottom + 50 && UpY < 0)
 			{
-				DownY = m_ClientRect.bottom;
+				DownY = m_ClientRect.bottom + 50;
 				UpY = 0;
 				bClose = true;
 				NextTime = 0;
 				m_eState = GAMEPLAY;
-				m_Player->SetLife(m_Player->GetLife() - 1);
 			}
 			else
 			{
@@ -824,7 +838,7 @@ void GameManager::MapRender()
 	HBRUSH oldBrush = (HBRUSH)SelectObject(m_backbufferDC, myBrush);
 
 	//¹è°æ
-	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom, PATCOPY);
+	PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom + 50, PATCOPY);
 
 	//Àû
 	EnemyIconRender(m_backbufferDC);
@@ -865,6 +879,20 @@ void GameManager::EnemyListBomb()
 
 }
 
+void GameManager::SetStage(int stage)
+{
+
+		PatBlt(m_backbufferDC, m_ClientRect.left, m_ClientRect.top, m_ClientRect.right, m_ClientRect.bottom + 50, BLACKNESS);
+		Clear();
+		ReInit();
+		m_iStage = stage;
+		TCHAR str[128];
+		wsprintf(str, TEXT("STAGE0%d"), m_iStage);
+		Maptool::GetSingleton()->Load(str);
+		m_eState = GAMESTAGE;
+}
+
+
 
 void GameManager::Clear()
 {
@@ -874,17 +902,23 @@ void GameManager::Clear()
 		m_Player = NULL;
 	}
 
-	for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
+	if (!m_Enemylist.empty())
 	{
-		delete (*it);
+		for (list<Enemy*>::iterator it = m_Enemylist.begin(); it != m_Enemylist.end(); it++)
+		{
+				delete (*it);
+		}
+		m_Enemylist.clear();
 	}
-	m_Enemylist.clear();
 
-	for (list<Item*>::iterator it = m_Itemlist.begin(); it != m_Itemlist.end(); it++)
+	if (!m_Itemlist.empty())
 	{
-		delete (*it);
+		for (list<Item*>::iterator it = m_Itemlist.begin(); it != m_Itemlist.end(); it++)
+		{
+			delete (*it);
+		}
+		m_Itemlist.clear();
 	}
-	m_Itemlist.clear();
 }
 
 GameManager::~GameManager()

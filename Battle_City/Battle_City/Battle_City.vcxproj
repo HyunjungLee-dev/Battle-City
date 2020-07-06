@@ -164,8 +164,12 @@
     <ClInclude Include="Maptool.h" />
     <ClInclude Include="Mecro.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Tank.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Battle_City.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
