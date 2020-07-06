@@ -5,15 +5,20 @@
 class Maptool : public Singleton< Maptool>
 {
 private:
-	HWND m_hWnd;
 	vector<Tile*> m_Map;
 	POS m_Cursor;
 	bool m_bConstruction;
+	int m_iID;
 public:
-	void Init(HWND hwnd);
+	void Init();
 	void SetMap();
-	void Init(POINT pt);
+	void Create();
+
+	void CursorRender(HDC hdc);
 	void Render(HDC hdc);
+	void layerRender(HDC hdc);
+
+
 	void Save();
 	void Load(LPCWSTR Flie);
 	bool MapConstruction();

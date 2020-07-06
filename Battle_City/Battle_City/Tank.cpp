@@ -5,13 +5,10 @@
 Tank::Tank()
 {
 	m_bullet = new Bullet;
-	m_dwLastTime = GetTickCount();
-	m_dwCurTime = GetTickCount();
-	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
 }
 
 
-void Tank::Render(HDC hdc)
+void Tank::Render(HDC hdc, float dTime)
 {
 	static int appeartype = OBJE_APPEAR0;
 	static int Shieldtype = OBJE_SHIELD00;
@@ -20,7 +17,7 @@ void Tank::Render(HDC hdc)
 
 	if (m_eTState == TANKAPPEAR)
 	{
-		Time += m_fDeltaTime;
+		Time += dTime;
 		
 		BitMapManager::GetSingleton()->GetImg((OBJECT)appeartype)->Draw(hdc, STARTX + m_pos.m_iX + 5, STARTY + m_pos.m_iY + 4, 1.4, 1.4);
 		if (Time > 0.1f)
@@ -36,7 +33,9 @@ void Tank::Render(HDC hdc)
 				if (m_eTankType == TYPEPLAYER)
 					m_eTState = TANKSHIELD;
 				else
+				{
 					m_eTState = TANKMOVE;
+				}
 				RepeatNum = 0;
 			}
 			Time = 0.0f;
@@ -45,7 +44,7 @@ void Tank::Render(HDC hdc)
 	}
 	else if (m_eTState == TANKSHIELD)
 	{
-		Time += m_fDeltaTime;
+		Time += dTime;
 
 		BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
 		BitMapManager::GetSingleton()->GetImg((OBJECT)Shieldtype)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
@@ -66,6 +65,7 @@ void Tank::Render(HDC hdc)
 			Time = 0.0f;
 
 		}
+		m_bullet->Render();
 	}
 	else
 	{
@@ -75,7 +75,7 @@ void Tank::Render(HDC hdc)
 			BitMapManager::GetSingleton()->GetImg(m_eTankimg)->Draw(hdc, STARTX + m_pos.m_iX, STARTY + m_pos.m_iY, 1, 1);
 		}
 	}
-
+	
 }
 
 bool Tank::Collision(RECT rct)
@@ -145,11 +145,12 @@ bool Tank::isTankfornt(RECT rct)
 }
 
 
-bool Tank::isWallfornt(vector<Tile*> v, int num)
+bool Tank::forntObjectCheck(vector<Tile*> v, int num, float dtime)
 {
 	int x[8];
 	int y[8];
 	RECT tmp;
+	static float Time = 0.0f;
 
 	x[0] = x[3] = x[5] = m_pos.m_iX + 5;
 	x[1] = x[6] = x[0] + TILESIZEX * 0.5;
@@ -162,34 +163,60 @@ bool Tank::isWallfornt(vector<Tile*> v, int num)
 	int	index = (int)(y[num] / TILESIZEY) * TILEX + (int)(x[num] / TILESIZEX);
 	if (index <0 || index >= TILEX * TILEY)
 		return false;
-	else if (v[index]->eTileID != (int)MAP_NONE)
+	else if (v[index]->eTileID != (int)MAP_NONE && v[index]->eTileID != (int)MAP_FOREST && v[index]->eTileID != MAP_ICE)
 	{
 		if (Collision(v[index]->Rct))
 			return true;
+	}
+	else if (v[index]->eTileID == MAP_ICE)
+	{
+		Time += dtime;
+
+		if(Time < 2.0f)
+			switch (m_edirection)
+			{
+				case UP:
+					m_pos.m_iY -= 20 * dtime;
+					break;
+				case DOWN:
+					m_pos.m_iY += 20 * dtime;
+					break;
+				case LEFT:
+					m_pos.m_iX -= 20 * dtime;
+					break;
+				case RIGHT:
+					m_pos.m_iX += 20 * dtime;
+					break;
+				default:
+					break;
+			}
+			Time = 0.0f;
+		
+		Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY + 3,(long)m_pos.m_iX + TILESIZEX - 3  ,(long)m_pos.m_iY + TILESIZEY - 3 };
 	}
 		
 
 	return false;
 }
 
-void Tank::Move(vector<Tile*> v)
+void Tank::Move(vector<Tile*> v, float dtime)
 {
 
-	if (Movable(v, m_edirection))
+	if (Movable(v, m_edirection, dtime))
 	{
 		switch (m_edirection)
 		{
 		case UP:
-			m_pos.m_iY -= 80 * m_fDeltaTime;
+			m_pos.m_iY -= 80 * dtime;
 			break;
 		case DOWN:
-			m_pos.m_iY += 80 * m_fDeltaTime;
+			m_pos.m_iY += 80 * dtime;
 			break;
 		case LEFT:
-			m_pos.m_iX -= 80 * m_fDeltaTime;
+			m_pos.m_iX -= 80 * dtime;
 			break;
 		case RIGHT:
-			m_pos.m_iX += 80 * m_fDeltaTime;
+			m_pos.m_iX += 80 * dtime;
 			break;
 		default:
 			break;
@@ -199,7 +226,7 @@ void Tank::Move(vector<Tile*> v)
 	Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY  + 3,(long)m_pos.m_iX + TILESIZEX -3  ,(long)m_pos.m_iY + TILESIZEY  - 3};
 }
 
-bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
+bool Tank::Movable(vector<Tile*> v, DIRECTION direction, float dtime)
 {
 
 		switch (direction)
@@ -207,14 +234,14 @@ bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
 		case UP:
 			if (m_pos.m_iY <= 0)
 				return false;
-			else if (isWallfornt(v, 1) || isWallfornt(v, 0) || isWallfornt(v, 2))
+			else if (forntObjectCheck(v, 1, dtime) || forntObjectCheck(v, 0, dtime) || forntObjectCheck(v, 2, dtime))
 				return false;
 			return true;
 			break;
 		case DOWN:
 			if (m_pos.m_iY >= TILESIZEY * 12)
 				return false;
-			else if (isWallfornt(v, 6)|| isWallfornt(v, 5) || isWallfornt(v, 7))
+			else if (forntObjectCheck(v, 6, dtime)|| forntObjectCheck(v, 5, dtime) || forntObjectCheck(v, 7, dtime))
 				return false;
 			else
 				return true;
@@ -222,7 +249,7 @@ bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
 		case LEFT:
 			if (m_pos.m_iX < 0)
 				return false;
-			else if (isWallfornt(v, 3) || isWallfornt(v, 0) || isWallfornt(v, 5))
+			else if (forntObjectCheck(v, 3, dtime) || forntObjectCheck(v, 0, dtime) || forntObjectCheck(v, 5, dtime))
 				return false;
 			else
 				return true;
@@ -230,7 +257,7 @@ bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
 		case RIGHT:
 			if (m_pos.m_iX > TILESIZEX * 12)
 				return false;
-			else if (isWallfornt(v, 4) || isWallfornt(v, 2) || isWallfornt(v, 7))
+			else if (forntObjectCheck(v, 4, dtime) || forntObjectCheck(v, 2, dtime) || forntObjectCheck(v, 7, dtime))
 				return false;
 			else
 				return true;
@@ -247,5 +274,6 @@ bool Tank::Movable(vector<Tile*> v, DIRECTION direction)
 
 Tank::~Tank()
 {
+	m_bullet->Clear();
 	delete m_bullet;
 }

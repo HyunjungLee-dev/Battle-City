@@ -7,12 +7,12 @@ Maptool::Maptool()
 {
 }
 
-void Maptool::Init(HWND hwnd)
+void Maptool::Init()
 {
-	m_hWnd = hwnd;
 	SetMap();
 	m_Cursor = { 0,0 };
 	m_bConstruction = false;
+	m_iID = 0;
 }
 
 void Maptool::SetMap()
@@ -30,22 +30,43 @@ void Maptool::SetMap()
 			m_Map.back()->Rct = {
 				long(m_Map.back()->fX),long(m_Map.back()->fY),long(m_Map.back()->fX + TILESIZEX),long(m_Map.back()->fY + TILESIZEY)
 			};
+			if (j == 5 && i == 12 || j == 5 && i == 11)
+			{
+				m_Map.back()->eTileID = MAP_BLOCKR;
+				m_Map.back()->Rct.left = long(m_Map.back()->fX + TILESIZEX * 0.5);
+			}
+			else if(j == 6 && i == 12)
+				m_Map.back()->eTileID = MAP_EAGLE;
+			else if(j == 6 && i ==11)
+				m_Map.back()->eTileID = MAP_BLOCK;
+			else if (j == 7 && i == 12 || j == 7 && i == 11)
+			{
+				m_Map.back()->eTileID = MAP_BLOCKL;
+				m_Map.back()->Rct.right = long(m_Map.back()->fX + TILESIZEX * 0.5);
+			}
 		}
 	}
 }
 
 
-void Maptool::Init(POINT pt)
+void Maptool::Create()
 {
-	int index = (pt.y / TILESIZEY) * TILEX + (pt.x / TILESIZEX);
+	static POS checkpos = m_Cursor;
 
-	if ((pt.x < TILESIZEX * 13 && pt.x > 0) && (pt.y < TILESIZEY * 13 && pt.y > 0))
+	int index = (m_Cursor.m_iY / TILESIZEY) * TILEX + (m_Cursor.m_iX / TILESIZEX);
+
+	if ((m_Cursor.m_iX < TILESIZEX * 13 && m_Cursor.m_iX >= 0) && (m_Cursor.m_iY < TILESIZEY * 13 && m_Cursor.m_iY >= 0))
 	{
-		if (m_Map[index]->eTileID >= MAP_ENDFALGE)
-			m_Map[index]->eTileID = MAP_NONE;
-		else
-		{
-			m_Map[index]->eTileID++;
+
+			if (checkpos.m_iX == m_Cursor.m_iX && checkpos.m_iY == m_Cursor.m_iY)
+			{
+				m_Map[index]->eTileID++;
+				if (m_Map[index]->eTileID >= MAP_GBLOCKR)
+					m_Map[index]->eTileID = MAP_NONE;
+				m_iID = m_Map[index]->eTileID;
+			}
+			else
+				m_Map[index]->eTileID = m_iID;
 			m_Map[index]->Rct = {long(m_Map[index]->fX),long(m_Map[index]->fY),long(m_Map[index]->fX + TILESIZEX),long(m_Map[index]->fY + TILESIZEY) };
 
 			if (m_Map[index]->eTileID == MAP_BLOCKT || m_Map[index]->eTileID == MAP_GBLOCKT)
@@ -63,13 +84,42 @@ void Maptool::Init(POINT pt)
 				m_Map[index]->Rct.left = long(m_Map[index]->fX + TILESIZEX * 0.5);
 
 			}
+			checkpos = m_Cursor;
+	}
+}
+
+void Maptool::CursorRender(HDC hdc)
+{
+	if (m_bConstruction)
+	{
+		/*if (m_fDeltaTime > 0.2f)
+		{
+			PatBlt(hdc, STARTX + m_Cursor.m_iX, STARTY + m_Cursor.m_iY, STARTX + m_Cursor.m_iX + TILESIZEX, STARTY + m_Cursor.m_iY + TILESIZEY, BLACKNESS);
 		}
-		InvalidateRect(m_hWnd, NULL, true);
+		if (m_fDeltaTime > 0.4f)
+		{*/
+			BitMapManager::GetSingleton()->GetImg(T_PLAYER_UP_0)->Draw(hdc, STARTX + m_Cursor.m_iX, STARTY + m_Cursor.m_iY, 1, 1);
+			//m_dwLastTime = m_dwCurTime;
+		//}
+	}
+}
+
+void Maptool::layerRender(HDC hdc)
+{
+	for (int i = 0; i < m_Map.size(); i++)
+	{
+		if (m_Map[i]->eTileID == MAP_FOREST)
+		{
+			BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileID)->Draw(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, 1, 1);
+
+		}
 	}
 }
 
 void Maptool::Render(HDC hdc)
 {
+	static float m_fCursorRenderTime = 0.0f;
+
 	RECT ret = { STARTX ,STARTY, TILESIZEX * TILEX , TILESIZEY * TILEY };
 	PatBlt(hdc, ret.left, ret.top, ret.right, ret.bottom, BLACKNESS);
 
@@ -77,39 +127,17 @@ void Maptool::Render(HDC hdc)
 	{
 		if (m_Map[i]->eTileID == MAP_NONE)
 		{
-			Rectangle(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, STARTX + m_Map[i]->fX + TILESIZEX, STARTY + m_Map[i]->fY + TILESIZEY);
+			//Rectangle(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, STARTX + m_Map[i]->fX + TILESIZEX, STARTY + m_Map[i]->fY + TILESIZEY);
 
 		}
 		else
 			BitMapManager::GetSingleton()->GetImg((MAP)m_Map[i]->eTileID)->Draw(hdc, STARTX + m_Map[i]->fX, STARTY + m_Map[i]->fY, 1, 1);
 		//Rectangle(hdc, STARTX + m_Map[i]->Rct.left, STARTY + m_Map[i]->Rct.top, STARTX + m_Map[i]->Rct.right, STARTY + m_Map[i]->Rct.bottom);
 	}
-
-	if(m_bConstruction)
-		BitMapManager::GetSingleton()->GetImg(T_PLAYER_UP_0)->Draw(hdc, STARTX + m_Cursor.m_iX, STARTY + m_Cursor.m_iY, 1, 1);
 }
 
 void Maptool::Save()
 {
-	//OPENFILENAME OFN;
-	//char str[300];
-	//char lpstrFile[MAX_PATH] = "";
-	//char lpstrPath[MAX_PATH] = "";
-
-	//memset(&OFN, 0, sizeof(OPENFILENAME));
-	//OFN.lStructSize = sizeof(OPENFILENAME);
-	//OFN.hwndOwner = m_hWnd;
-	//OFN.lpstrFilter = L"Every File(*.*)\0*.*\0Text File\0*.txt;*.doc\0";
-	//OFN.lpstrFile = (LPWSTR)lpstrFile;
-	//OFN.nMaxFile = 256;
-	//GetCurrentDirectory(MAX_PATH, (LPWSTR)lpstrPath);
-	//OFN.lpstrInitialDir = (LPWSTR)lpstrPath;
-	//if (GetSaveFileName(&OFN) == 0)
-	//{
-	//	DWORD err = CommDlgExtendedError();
-	//	return;
-	//}
-
 	HANDLE hFile = CreateFile(L"Construction", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	for (int i = 0; i < m_Map.size(); i++)
 	{
@@ -124,7 +152,6 @@ void Maptool::Save()
 
 	}
 	CloseHandle(hFile);
-	InvalidateRect(m_hWnd, NULL, false);
 }
 
 void Maptool::Load(LPCWSTR Flie)
@@ -143,7 +170,6 @@ void Maptool::Load(LPCWSTR Flie)
 		ReadFile(hFile, &m_Map[i]->Rct, sizeof(RECT), &readB, NULL);
 	}
 	CloseHandle(hFile);
-	InvalidateRect(m_hWnd, NULL, false);
 }
 
 void Maptool::Clear()
@@ -206,9 +232,9 @@ void Maptool::Collision(int index, DIRECTION direct)
 
 bool Maptool::MapConstruction()
 {
+
 	m_bConstruction = true;
 
-	
 		if (GetAsyncKeyState(VK_LEFT) & 0x0001)
 		{
 			if (m_Cursor.m_iX <= 0)
@@ -233,13 +259,15 @@ bool Maptool::MapConstruction()
 				return false;
 			m_Cursor.m_iY += TILESIZEY;
 		}
-		else if (GetAsyncKeyState('Z') & 0x8000)
+		else if (GetAsyncKeyState('Z') & 0x0001)
 		{
+			Create();
 
 		}
-		else if (GetKeyState(VK_RETURN) & 0x8000)
+		else if (GetAsyncKeyState(VK_RETURN) & 0x0001)
 		{
 			Save();
+			m_bConstruction = false;
 			return true;
 		}
 	

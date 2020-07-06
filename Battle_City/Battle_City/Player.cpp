@@ -4,17 +4,12 @@
 
 Player::Player()
 {
+
 }
 
 void Player::Init()
 {
-	//m_dwLastTime = GetTickCount();
-	//m_dwCurTime = GetTickCount();
-	//m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
-
 	m_iLife = 3;
-
-	//Tank
 	Respon();
 
 	Rct = { (long)m_pos.m_iX + 3 ,(long)m_pos.m_iY + 3,(long)m_pos.m_iX + TILESIZEX - 3  ,(long)m_pos.m_iY + TILESIZEY - 3 };
@@ -30,46 +25,48 @@ void Player::Respon()
 	m_eTState = TANKAPPEAR;
 }
 
-void Player::Update(vector<Tile*> v)
+void Player::Update(vector<Tile*> v, float dtime)
 {
-	m_dwCurTime = GetTickCount();
-	m_fDeltaTime = (m_dwCurTime - m_dwLastTime) / 1000.0f;
-	m_dwLastTime = m_dwCurTime;
 
-	if (m_eTState != TANKAPPEAR)
+	if (m_eTState != TANKAPPEAR && m_eTState != TANKNONE)
 	{
 		m_bullet->Update(v);
-		KeyCheck(v);
+		KeyCheck(v, dtime);
 	}
 }
 
 
-void Player::KeyCheck(vector<Tile*> v)
+void Player::KeyCheck(vector<Tile*> v, float dtime)
 {
-		if (GetKeyState(VK_LEFT) & 0x8000)
-		{
-			m_edirection = LEFT;
-			TankImg();
-			Move(v);
-		}
-		else if (GetKeyState(VK_UP) & 0x8000)
-		{
-			m_edirection = UP;
-			TankImg();
-			Move(v);
-		}
-		else if (GetKeyState(VK_RIGHT) & 0x8000)
-		{
-			m_edirection = RIGHT;
-			TankImg();
-			Move(v);
-		}
-		else if (GetKeyState(VK_DOWN) & 0x8000)
-		{
-			m_edirection = DOWN;
-			TankImg();
-			Move(v);
-		}
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	{
+		m_edirection = LEFT;
+		TankImg();
+		m_bKeypush = true;
+	}
+	else if (GetAsyncKeyState(VK_UP) & 0x8000)
+	{
+		m_edirection = UP;
+		TankImg();
+		m_bKeypush = true;
+	}
+	else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	{
+		m_edirection = RIGHT;
+		TankImg();
+		m_bKeypush = true;
+	}
+	else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+	{
+		m_edirection = DOWN;
+		TankImg();
+		m_bKeypush = true;
+	}
+	else
+		m_bKeypush = false;
+
+	if(m_bKeypush)
+		Move(v, dtime);
 
 		if (GetAsyncKeyState(0x5A) & 0x0001)
 		{

@@ -5,15 +5,18 @@ class Player : public Tank
 {
 private:
 	int m_iLife;
+	bool m_bKeypush;
+
+
 public:
 	virtual void Init();
-	void Update(vector<Tile*> v);
+	void Update(vector<Tile*> v,float dtime);
 	virtual void TankImg();
-	void KeyCheck(vector<Tile*> v);
+	void KeyCheck(vector<Tile*> v, float dtime);
 	void Respon();
 
 	int GetLife() { return m_iLife; }
-	void SetLife() { m_iLife--; }
+	void SetLife(int life) { m_iLife = life; }
 	Player();
 	virtual ~Player();
 };

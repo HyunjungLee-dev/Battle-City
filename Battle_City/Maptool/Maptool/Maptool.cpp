@@ -25,8 +25,22 @@ void Maptool::SetMap()
 			m_Map.back()->fSizeX = TILESIZEX;
 			m_Map.back()->fSizeY = TILESIZEY;
 			m_Map.back()->Rct = {
-				long(m_Map.back()->fX),long(m_Map.back()->fY),long(m_Map.back()->fX + TILESIZEX),long( m_Map.back()->fY + TILESIZEY)
+				long(m_Map.back()->fX),long(m_Map.back()->fY),long(m_Map.back()->fX + TILESIZEX),long(m_Map.back()->fY + TILESIZEY)
 			};
+			if (j == 5 && i == 12 || j == 5 && i == 11)
+			{
+				m_Map.back()->eTileID = MAP_BLOCKR;
+				m_Map.back()->Rct.left = long(m_Map.back()->fX + TILESIZEX * 0.5);
+			}
+			else if (j == 6 && i == 12)
+				m_Map.back()->eTileID = MAP_EAGLE;
+			else if (j == 6 && i == 11)
+				m_Map.back()->eTileID = MAP_BLOCK;
+			else if (j == 7 && i == 12 || j == 7 && i == 11)
+			{
+				m_Map.back()->eTileID = MAP_BLOCKL;
+				m_Map.back()->Rct.right = long(m_Map.back()->fX + TILESIZEX * 0.5);
+			}
 		}
 	}
 }

@@ -121,13 +121,12 @@ void  Bullet::Collision(vector<Tile*> v)
 	{
 		for (int i = 0; i < v.size(); i++) // 벽
 		{
-			if (v[i]->eTileID != MAP_NONE)
+			if (v[i]->eTileID != MAP_NONE && v[i]->eTileID != MAP_RIVER && v[i]->eTileID != MAP_ICE)
 			{
 				if (IsPointInRect(v[i]->Rct,x,y))
 				{
 					m_eCollType = TYPEWALL;
 					type = OBJE_EXPLOSION00;
-					//충돌했을때 벽 변화 넣기
 					Maptool::GetSingleton()->Collision(i, m_direction);
 					if (v[i]->eTileID == MAP_ENDFALGE)
 					{
@@ -193,35 +192,48 @@ void Bullet::ExsplosionRender(HDC hdc)
 
 	static float Time = 0.0f;
 	static int tmptype = type;
-	static int RepeatNum = 0;
+	//static int RepeatNum = 0;
 	static bool check = false;
-	
+	static int time = 0;
 	Time += m_fDeltaTime;
 
-	if (Time > 0.1f)
+	if (Time > 0.15f)
 	{
 		if (m_eCollType == TYPEWALL)
 		{
 			tmptype++;
-			if (tmptype > OBJE_EXPLOSION01)
+			if (tmptype = OBJE_EXPLOSION01)
 			{
 				tmptype = OBJE_EXPLOSION00;
-				RepeatNum++;
+				Clear();
+				//tmptype = type;
 			}
 		}
 		else if (m_eCollType == TYPETANK)
 		{
-			tmptype++;
-			if (tmptype > OBJE_EXPLOSION04)
+			if (check)
 			{
-				tmptype = OBJE_EXPLOSION00;
-				RepeatNum++;
+				tmptype--;
+				if (tmptype <= OBJE_EXPLOSION00)
+				{
+					Clear();
+					check = false;
+					//tmptype = type;
+				}
+			}
+			else
+			{
+				tmptype++;
+				if (tmptype >= OBJE_EXPLOSION04)
+				{
+					check = true;
+				}
 			}
 		}
 		Time = 0.0f;
 	}
 
-	SIZE size = BitMapManager::GetSingleton()->GetImg((OBJECT)type)->GetSize();
+	SIZE size = BitMapManager::GetSingleton()->GetImg((OBJECT)tmptype)->GetSize();
 
 	if (m_direction == LEFT)
 	{
@@ -240,11 +252,11 @@ void Bullet::ExsplosionRender(HDC hdc)
 		BitMapManager::GetSingleton()->GetImg((OBJECT)tmptype)->Draw(hdc, x - size.cx * 0.5, y - size.cy* 0.5, 1, 1);
 	}
 
-	if (RepeatNum == 1)
+	/*if (RepeatNum == 1)
 	{
 		Clear();
 		RepeatNum = 0;
-	}
+	}*/
 
 }
 

@@ -19,7 +19,9 @@ using namespace std;
 #define STARTX	 15
 #define STARTY	 40
 
-#define MAXSTAGE 1
+#define MAXSTAGE 3
+
+
 
 
 
@@ -127,7 +129,8 @@ enum GAMESTATE
 	GAMCONSTRUCTION,
 	GAMEOVER,
 	GAMEWIN,
-	GANERESTART,
+	GAMERESTART,
+	GAMENEXT,
 	GAMEEND,
 };
 
@@ -143,6 +146,7 @@ enum TANKSTATE
 enum TYPE
 {
 	TYPEENEMY,
+	TYPEITEM_ENEMY,
 	TYPEPLAYER,
 	TYPETANK,
 	TYPEWALL,
@@ -174,3 +178,4 @@ struct POS
 	float m_iX;
 	float m_iY;
 };
+

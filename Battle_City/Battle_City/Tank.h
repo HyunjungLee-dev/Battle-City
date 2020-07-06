@@ -13,25 +13,21 @@ protected:
 	TANKSTATE m_eTState;
 
 	Bullet* m_bullet;
-
-	DWORD	m_dwLastTime;
-	DWORD	m_dwCurTime;
-	float	m_fDeltaTime;
 public:
 	virtual void Init() = 0;
 	virtual void TankImg() = 0;
-	void Move(vector<Tile*> v);
-	bool Movable(vector<Tile*> v, DIRECTION direction);
-	void Render(HDC hdc);
+	void Move(vector<Tile*> v,float dtime);
+	bool Movable(vector<Tile*> v, DIRECTION direction,float dtime);
+	void Render(HDC hdc,float Time);
 
-	bool isWallfornt(vector<Tile*> v, int num);
+	bool forntObjectCheck(vector<Tile*> v, int num, float dtime);
 	bool isTankfornt(RECT rct);
 	bool Collision(RECT rct);
 
 
 	void SetTankState(TANKSTATE state) { m_eTState = state; }
 	
-	
+
 	TANKSTATE GetState() { return m_eTState; }
 	Bullet* GetBullet() { return m_bullet; }
 	RECT GetRect() { return Rct; }

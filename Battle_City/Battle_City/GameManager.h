@@ -6,12 +6,15 @@
 class GameManager
 {
 private:
+
+
 	HWND m_hWnd;
 	HDC m_backbufferDC;
 	RECT m_ClientRect;
 
 	GAMESTATE m_eState;
 	bool m_bGameOver;
+
 
 	DWORD	m_dwLastTime;
 	DWORD	m_dwCurTime;
@@ -47,6 +50,7 @@ public:
 
 	void TankCollision();
 	void TankbulletCollision();
+	bool CreatePosCheck(POS pos);
 
 
 	void Title();
